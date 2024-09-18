@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Document Scanner Demo</string>
+    <string name="scanned_image">Scanned Image</string>
+    <string name="image_with_cropper">Original Image With Cropper</string>
+</resources>
