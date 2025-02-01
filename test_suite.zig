@@ -1,114 +1,85 @@
-// clear; zig test test_suite.zig
-
 const std = @import("std");
+const time = std.time;
+const Instant = time.Instant;
+const print = std.debug.print;
 
 pub fn Solution(
     comptime TInput: type,
     comptime TOutput: type,
 ) type {
     return struct {
-        run: *const fn (x: TInput) TOutput,
+        run: *const fn (allocator: std.mem.Allocator, x: TInput) anyerror!TOutput,
+    };
+}
+
+pub fn RunResult(comptime TOutput: type) type {
+    return struct {
+        failed: bool,
+        outputs: std.ArrayList(TOutput),
     };
 }
 
 pub fn TestSuite(
     comptime TInput: type,
     comptime TOutput: type,
+    Equal: *const fn (x: TOutput, y: TOutput) bool,
 ) type {
     return struct {
         const Self = @This();
         const TSolution = Solution(TInput, TOutput);
-        const TCases = std.ArrayList(TInput);
-        const TExpectations = std.ArrayList(TOutput);
+        const TInputs = std.ArrayList(TInput);
+        const TOutputs = std.ArrayList(TOutput);
         const TSolutions = std.ArrayList(TSolution);
-        cases: TCases,
-        expectations: TExpectations,
+        const TRunResult = RunResult(TOutput);
+        allocator: std.mem.Allocator,
+        inputs: TInputs,
+        outputs: TOutputs,
         solutions: TSolutions,
+        result: TRunResult,
         pub fn init(allocator: std.mem.Allocator) Self {
             return .{
-                .cases = TCases.init(allocator),
-                .expectations = TExpectations.init(allocator),
+                .allocator = allocator,
+                .inputs = TInputs.init(allocator),
+                .outputs = TOutputs.init(allocator),
                 .solutions = TSolutions.init(allocator),
+                .result = .{
+                    .failed = false,
+                    .outputs = TOutputs.init(allocator)
+                },
             };
         }
         pub fn deinit(self: *Self) void {
-            self.cases.deinit();
-            self.expectations.deinit();
+            self.inputs.deinit();
+            self.outputs.deinit();
             self.solutions.deinit();
+            self.result.outputs.deinit();
         }
-        pub fn run(self: Self) void {
+        pub fn run(self: *Self) !void {
+            self.result.failed = false;
+            self.result.outputs.clearAndFree();
             for (self.solutions.items, 1..) |solution, i| {
-                for (self.cases.items, self.expectations.items, 1..) |case, expectation, j| {
-                    const got = solution.run(case);
-                    if (got == expectation) {
-                        std.debug.print(" .  pass\n", .{});
+                for (self.inputs.items, self.outputs.items, 1..) |input, output, j| {
+                    // measure time
+                    const start = try Instant.now();
+                    // do the thing
+                    const got = try solution.run(self.allocator, input);
+                    try self.result.outputs.append(got);
+                    // measure time
+                    const end = try Instant.now();
+                    const elapsed: f64 = @floatFromInt(end.since(start));
+                    const us_elapsed = elapsed / time.ns_per_us;
+                    // compare
+                    if (Equal(got, output)) {
+                        print("[ ] pass | {d:.1}us\n", .{ us_elapsed });
                     } else {
-                        std.debug.print(
-                            "[x] failed: case {}, solution {}\n",
-                            .{ i, j },
+                        print(
+                            "[x] failed: solution {d}, case {d} | {d:.1}us\n",
+                            .{ i, j, us_elapsed },
                         );
+                        self.result.failed = true;
                     }
                 }
             }
         }
     };
-}
-
-fn Sum(x: []const i32) i32 {
-    var sum: i32 = 0;
-    for (x) |val| {
-        sum += val;
-    }
-    return sum;
-}
-
-test "sum" {
-
-    var case_tester = TestSuite([]const i32, i32).init(std.testing.allocator);
-    defer case_tester.deinit();
-
-    try case_tester.cases.append(&.{ 1, 2, 3, 4 });
-    try case_tester.expectations.append(10);
-
-    try case_tester.cases.append(&.{ 2, 3, 4, 5 });
-    try case_tester.expectations.append(14);
-
-    try case_tester.solutions.appendSlice(&.{
-        .{ .run = &Sum },
-        .{ .run = &Sum },
-    });
-
-    case_tester.run();
-}
-
-fn Factorial(x: i32) i32 {
-    if (x == 0) {
-        return 1;
-    } else if (x < 0) {
-        unreachable;
-    }
-    var res: i32 = 1;
-    var i: i32 = x;
-    while (i > 0) {
-        res *= i;
-        i -= 1;
-    }
-    return res;
-}
-
-test "factorial" {
-
-    var case_tester = TestSuite(i32, i32).init(std.testing.allocator);
-    defer case_tester.deinit();
-
-    try case_tester.cases.appendSlice(&.{ 1, 2, 3, 4, 5, 6 });
-    try case_tester.expectations.appendSlice(&.{ 1, 2, 6, 24, 120, 720 });
-
-    try case_tester.solutions.appendSlice(&.{
-        .{ .run = &Factorial },
-        .{ .run = &Factorial },
-    });
-
-    case_tester.run();
-
 }
