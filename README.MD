@@ -13,3 +13,7 @@ Specific one
 ```
 zig build test -Do="./leetcode/1_two_sum.zig"
 ```
+
+## Note
+
+Remember to remove `std.debug.print` lines when compairing performance

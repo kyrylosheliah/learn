@@ -47,10 +47,7 @@ pub fn TestSuite(
                 .inputs = TInputs.init(allocator),
                 .outputs = TOutputs.init(allocator),
                 .solutions = TSolutions.init(allocator),
-                .result = .{
-                    .failed = false,
-                    .outputs = TOutputs.init(allocator)
-                },
+                .result = .{ .failed = false, .outputs = TOutputs.init(allocator) },
             };
         }
         pub fn deinit(self: *Self) void {
@@ -76,12 +73,14 @@ pub fn TestSuite(
                     const end = try Instant.now();
                     const elapsed: f64 = @floatFromInt(end.since(start));
                     const us_elapsed = elapsed / time.ns_per_us;
-                    // compare
+                    // compare `solution(case)`
                     if (Equal(got, output)) {
-                        print("[ ] pass | {d:.1}us\n", .{ us_elapsed });
+                        print("... pass {d}({d}) | {d:.1}us\n", .{
+                            i, j, us_elapsed,
+                        });
                     } else {
                         print(
-                            "[x] failed: solution {d}, case {d} | {d:.1}us\n",
+                            ">>> fail {d}({d}) <<< {d:.1}us\n",
                             .{ i, j, us_elapsed },
                         );
                         self.result.failed = true;

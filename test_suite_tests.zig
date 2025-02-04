@@ -5,8 +5,8 @@ fn Equal_i32(x: i32, y: i32) bool {
     return x == y;
 }
 
-fn Sum(allocator: std.mem.Allocator, x: []const i32) !i32 {
-    _ = &allocator;
+fn Sum(arena: *std.heap.ArenaAllocator, x: []const i32) !i32 {
+    _ = &arena;
     var sum: i32 = 0;
     for (x) |val| {
         sum += val;
@@ -15,13 +15,7 @@ fn Sum(allocator: std.mem.Allocator, x: []const i32) !i32 {
 }
 
 test "sum" {
-    const allocator = std.testing.allocator;
-
-    var test_suite = TestSuite(
-        []const i32,
-        i32,
-        Equal_i32,
-    ).init(allocator);
+    var test_suite = TestSuite([]const i32, i32, Equal_i32).init();
     defer test_suite.deinit();
 
     try test_suite.inputs.append(&.{ 1, 2, 3, 4 });
@@ -40,8 +34,8 @@ test "sum" {
     try std.testing.expect(!test_suite.result.failed);
 }
 
-fn Factorial(allocator: std.mem.Allocator, x: i32) !i32 {
-    _ = &allocator;
+fn Factorial(arena: *std.heap.ArenaAllocator, x: i32) !i32 {
+    _ = &arena;
     if (x == 0) {
         return 1;
     } else if (x < 0) {
@@ -57,13 +51,7 @@ fn Factorial(allocator: std.mem.Allocator, x: i32) !i32 {
 }
 
 test "factorial" {
-    const allocator = std.testing.allocator;
-
-    var test_suite = TestSuite(
-        i32,
-        i32,
-        Equal_i32,
-    ).init(allocator);
+    var test_suite = TestSuite(i32, i32, Equal_i32).init();
     defer test_suite.deinit();
 
     try test_suite.inputs.appendSlice(&.{ 1, 2, 3, 4, 5, 6 });
