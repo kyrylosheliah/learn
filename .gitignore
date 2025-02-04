@@ -12,3 +12,6 @@ zig-cache/
 *.exe
 *.obj
 *.pdb
+
+# generated code
+\#\#\#_dynamic_main.zig

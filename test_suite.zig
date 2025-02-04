@@ -8,7 +8,7 @@ pub fn Solution(
     comptime TOutput: type,
 ) type {
     return struct {
-        run: *const fn (allocator: std.mem.Allocator, x: TInput) anyerror!TOutput,
+        run: *const fn (arena: *std.heap.ArenaAllocator, x: TInput) anyerror!TOutput,
     };
 }
 
@@ -32,13 +32,18 @@ pub fn TestSuite(
         const TSolutions = std.ArrayList(TSolution);
         const TRunResult = RunResult(TOutput);
         allocator: std.mem.Allocator,
+        arena: *std.heap.ArenaAllocator,
         inputs: TInputs,
         outputs: TOutputs,
         solutions: TSolutions,
         result: TRunResult,
-        pub fn init(allocator: std.mem.Allocator) Self {
+        pub fn init() Self {
+            const allocator = std.testing.allocator;
+            const arena = allocator.create(std.heap.ArenaAllocator) catch unreachable;
+            arena.* = std.heap.ArenaAllocator.init(allocator);
             return .{
                 .allocator = allocator,
+                .arena = arena,
                 .inputs = TInputs.init(allocator),
                 .outputs = TOutputs.init(allocator),
                 .solutions = TSolutions.init(allocator),
@@ -53,6 +58,9 @@ pub fn TestSuite(
             self.outputs.deinit();
             self.solutions.deinit();
             self.result.outputs.deinit();
+            // ...
+            self.arena.deinit();
+            self.allocator.destroy(self.arena);
         }
         pub fn run(self: *Self) !void {
             self.result.failed = false;
@@ -62,7 +70,7 @@ pub fn TestSuite(
                     // measure time
                     const start = try Instant.now();
                     // do the thing
-                    const got = try solution.run(self.allocator, input);
+                    const got = try solution.run(self.arena, input);
                     try self.result.outputs.append(got);
                     // measure time
                     const end = try Instant.now();
