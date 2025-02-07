@@ -23,6 +23,7 @@ pub fn TestSuite(
     comptime TInput: type,
     comptime TOutput: type,
     Equal: *const fn (x: TOutput, y: TOutput) bool,
+    test_name: []const u8,
 ) type {
     return struct {
         const Self = @This();
@@ -62,6 +63,7 @@ pub fn TestSuite(
         pub fn run(self: *Self) !void {
             self.result.failed = false;
             self.result.outputs.clearAndFree();
+            print("\n... {s}\n", .{test_name});
             for (self.solutions.items, 1..) |solution, i| {
                 for (self.inputs.items, self.outputs.items, 1..) |input, output, j| {
                     // measure time
@@ -75,12 +77,13 @@ pub fn TestSuite(
                     const us_elapsed = elapsed / time.ns_per_us;
                     // compare `solution(case)`
                     if (Equal(got, output)) {
-                        print("... pass {d}({d}) | {d:.1}us\n", .{
-                            i, j, us_elapsed,
+                        print(
+                            "ok {d}:{d} | {d:.1}us\n", 
+                            .{ i, j, us_elapsed,
                         });
                     } else {
                         print(
-                            ">>> fail {d}({d}) <<< {d:.1}us\n",
+                            "### fail {d}:{d} | {d:.1}us\n",
                             .{ i, j, us_elapsed },
                         );
                         self.result.failed = true;

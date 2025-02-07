@@ -32,7 +32,7 @@ pub fn build(b: *std.Build) !void {
         test_suite,
     );
     const run_test = b.addRunArtifact(test_cmd);
-    run_test.has_side_effects = true; // ensure output is always shown
+    run_test.has_side_effects = true; // ensure the output is always shown
 
     const test_step = b.step("test", "Run tests");
     test_step.dependOn(&run_test.step);

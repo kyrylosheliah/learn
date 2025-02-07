@@ -92,7 +92,7 @@ fn OnePassHashTable(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput {
 }
 
 test "1. Two sum" {
-    var test_suite = TestSuite(TInput, TOutput, Equal).init();
+    var test_suite = TestSuite(TInput, TOutput, Equal, "two sum").init();
     defer test_suite.deinit();
 
     try test_suite.inputs.append(.{ .nums = &.{ 2, 7, 11, 15 }, .target = 9 });

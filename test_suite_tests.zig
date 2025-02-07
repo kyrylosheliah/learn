@@ -15,7 +15,7 @@ fn Sum(arena: *std.heap.ArenaAllocator, x: []const i32) !i32 {
 }
 
 test "sum" {
-    var test_suite = TestSuite([]const i32, i32, Equal_i32).init();
+    var test_suite = TestSuite([]const i32, i32, Equal_i32, "sum").init();
     defer test_suite.deinit();
 
     try test_suite.inputs.append(&.{ 1, 2, 3, 4 });
@@ -51,7 +51,7 @@ fn Factorial(arena: *std.heap.ArenaAllocator, x: i32) !i32 {
 }
 
 test "factorial" {
-    var test_suite = TestSuite(i32, i32, Equal_i32).init();
+    var test_suite = TestSuite(i32, i32, Equal_i32, "factorial").init();
     defer test_suite.deinit();
 
     try test_suite.inputs.appendSlice(&.{ 1, 2, 3, 4, 5, 6 });
