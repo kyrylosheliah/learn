@@ -31,7 +31,7 @@ test "sum" {
 
     try test_suite.run();
 
-    try std.testing.expect(!test_suite.result.failed);
+    try std.testing.expect(test_suite.result.pass);
 }
 
 fn Factorial(arena: *std.heap.ArenaAllocator, x: i32) !i32 {
@@ -64,5 +64,5 @@ test "factorial" {
 
     try test_suite.run();
 
-    try std.testing.expect(!test_suite.result.failed);
+    try std.testing.expect(test_suite.result.pass);
 }

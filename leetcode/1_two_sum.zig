@@ -111,5 +111,5 @@ test "1. Two sum" {
 
     try test_suite.run();
 
-    try std.testing.expect(!test_suite.result.failed);
+    try std.testing.expect(test_suite.result.pass);
 }

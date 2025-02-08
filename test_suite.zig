@@ -14,7 +14,7 @@ pub fn Solution(
 
 pub fn RunResult(comptime TOutput: type) type {
     return struct {
-        failed: bool,
+        pass: bool,
         outputs: std.ArrayList(TOutput),
     };
 }
@@ -48,7 +48,7 @@ pub fn TestSuite(
                 .inputs = TInputs.init(allocator),
                 .outputs = TOutputs.init(allocator),
                 .solutions = TSolutions.init(allocator),
-                .result = .{ .failed = false, .outputs = TOutputs.init(allocator) },
+                .result = .{ .pass = false, .outputs = TOutputs.init(allocator) },
             };
         }
         pub fn deinit(self: *Self) void {
@@ -61,7 +61,7 @@ pub fn TestSuite(
             self.allocator.destroy(self.arena);
         }
         pub fn run(self: *Self) !void {
-            self.result.failed = false;
+            self.result.pass = true;
             self.result.outputs.clearAndFree();
             print("\n... {s}\n", .{test_name});
             for (self.solutions.items, 1..) |solution, i| {
@@ -86,7 +86,7 @@ pub fn TestSuite(
                             "### fail {d}:{d} | {d:.1}us\n",
                             .{ i, j, us_elapsed },
                         );
-                        self.result.failed = true;
+                        self.result.pass = false;
                     }
                 }
             }

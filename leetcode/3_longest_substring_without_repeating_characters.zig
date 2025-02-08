@@ -133,6 +133,6 @@ test "3" {
 
     try test_suite.run();
 
-    try std.testing.expect(!test_suite.result.failed);
+    try std.testing.expect(test_suite.result.pass);
 }
 

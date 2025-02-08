@@ -162,7 +162,7 @@ test "2 add two number arrays" {
 
     try test_suite.run();
 
-    try std.testing.expect(!test_suite.result.failed);
+    try std.testing.expect(test_suite.result.pass);
 }
 
 fn printList(x: TOutput_List) void {
@@ -401,5 +401,5 @@ test "2 add two number lists" {
 
     try test_suite.run();
 
-    try std.testing.expect(!test_suite.result.failed);
+    try std.testing.expect(test_suite.result.pass);
 }
