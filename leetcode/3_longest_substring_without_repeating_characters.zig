@@ -41,10 +41,9 @@ fn equalInt(x: TOutput, y: TOutput) bool {
     return x == y;
 }
 
-fn decrementSlidingWindow_Hashmap(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput {
-    const alloc = arena.allocator();
+fn decrementSlidingWindow_Hashmap(alloc: *std.mem.Allocator, x: TInput) !TOutput {
     //print("input: \"{s}\"\n", .{x});
-    var map = std.AutoHashMap(u8, usize).init(alloc);
+    var map = std.AutoHashMap(u8, usize).init(alloc.*);
     var start: usize = 0;
     var len = x.len - 1;
     var end = start + len;
@@ -90,8 +89,8 @@ fn printWindow(prefix: []const u8, x: []const u8, start: usize, end: usize) void
     //print("{s}\n", .{ x[start..end+1] });
 }
 
-fn repetitionReducesSlidingWindow_Array(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput {
-    _ = arena;
+fn repetitionReducesSlidingWindow_Array(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+    _ = alloc;
     var arr: [256]u8 = .{ 0, } ** 256;
     var start: usize = 0;
     var end: usize = 0;
@@ -133,6 +132,5 @@ test "3" {
 
     try test_suite.run();
 
-    try std.testing.expect(test_suite.result.pass);
+    try std.testing.expect(test_suite.pass);
 }
-

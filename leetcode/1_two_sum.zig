@@ -47,19 +47,23 @@ fn Equal(x: TOutput, y: TOutput) bool {
     return true;
 }
 
-fn CombinationsPyramid(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput {
-    _ = &arena;
+fn CombinationsPyramid(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+    _ = alloc;
     const len = x.nums.len;
     for (1..len) |gap| {
         for (gap..len) |right| {
             const left = right - gap;
             if (x.nums[left] + x.nums[right] == x.target) {
-                // is possible to not deinit with arena allocation strategy
-                //var result = try std.ArrayList(i32)
-                //    .initCapacity(allocator, 2);
+                //var result = try std.ArrayList(i32).initCapacity(alloc, 2);
                 //try result.append(@intCast(left));
                 //try result.append(@intCast(right));
                 //return try result.toOwnedSlice();
+                // ...
+                //var result = try alloc.alloc(i32, 2);
+                //result[0] = @intCast(left);
+                //result[1] = @intCast(right);
+                //return result;
+                // ...
                 const static_result = struct {
                     var arr = [2]i32{ 0, 0 };
                 };
@@ -72,8 +76,8 @@ fn CombinationsPyramid(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput {
     return &.{};
 }
 
-fn OnePassHashTable(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput {
-    var map = std.AutoHashMap(i32, usize).init(arena.allocator());
+fn OnePassHashTable(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+    var map = std.AutoHashMap(i32, usize).init(alloc.*);
     for (0..x.nums.len) |i| {
         const in_nums = x.nums[i];
         const complement: i32 = x.target - in_nums;
@@ -111,5 +115,5 @@ test "1. Two sum" {
 
     try test_suite.run();
 
-    try std.testing.expect(test_suite.result.pass);
+    try std.testing.expect(test_suite.pass);
 }

@@ -1,4 +1,5 @@
 const std = @import("std");
+const allocator = std.testing.allocator;
 const time = std.time;
 const Instant = time.Instant;
 const print = std.debug.print;
@@ -8,15 +9,21 @@ pub fn Solution(
     comptime TOutput: type,
 ) type {
     return struct {
-        run: *const fn (arena: *std.heap.ArenaAllocator, x: TInput) anyerror!TOutput,
+        run: *const fn (alloc: *std.mem.Allocator, x: TInput) anyerror!TOutput,
     };
 }
 
-pub fn RunResult(comptime TOutput: type) type {
-    return struct {
-        pass: bool,
-        outputs: std.ArrayList(TOutput),
-    };
+// thanks to dimdin:
+// https://ziggit.dev/t/what-is-the-resolution-of-std-time-timer-and-is-it-good-enough/4678/3
+fn x86_64_ticks() u64 {
+    return asm volatile(
+        \\ rdtsc
+        \\ shl $32, %%rdx
+        \\ or %%rdx, %%rax
+        : [ret] "={rax}" (-> u64)
+        :
+        : "rdx"
+    );
 }
 
 pub fn TestSuite(
@@ -31,63 +38,58 @@ pub fn TestSuite(
         const TInputs = std.ArrayList(TInput);
         const TOutputs = std.ArrayList(TOutput);
         const TSolutions = std.ArrayList(TSolution);
-        const TRunResult = RunResult(TOutput);
-        allocator: std.mem.Allocator,
         arena: *std.heap.ArenaAllocator,
         inputs: TInputs,
         outputs: TOutputs,
         solutions: TSolutions,
-        result: TRunResult,
+        pass: bool,
         pub fn init() Self {
-            const allocator = std.testing.allocator;
-            const arena = allocator.create(std.heap.ArenaAllocator) catch unreachable;
+            var arena = allocator.create(std.heap.ArenaAllocator) catch unreachable;
             arena.* = std.heap.ArenaAllocator.init(allocator);
+            const alloc = arena.allocator();
             return .{
-                .allocator = allocator,
                 .arena = arena,
-                .inputs = TInputs.init(allocator),
-                .outputs = TOutputs.init(allocator),
-                .solutions = TSolutions.init(allocator),
-                .result = .{ .pass = false, .outputs = TOutputs.init(allocator) },
+                .inputs = TInputs.init(alloc),
+                .outputs = TOutputs.init(alloc),
+                .solutions = TSolutions.init(alloc),
+                .pass = false,
             };
         }
         pub fn deinit(self: *Self) void {
-            self.inputs.deinit();
-            self.outputs.deinit();
-            self.solutions.deinit();
-            self.result.outputs.deinit();
-            // ...
             self.arena.deinit();
-            self.allocator.destroy(self.arena);
+            allocator.destroy(self.arena);
         }
         pub fn run(self: *Self) !void {
-            self.result.pass = true;
-            self.result.outputs.clearAndFree();
+            self.pass = true;
             print("\n... {s}\n", .{test_name});
+            var alloc = self.arena.allocator();
             for (self.solutions.items, 1..) |solution, i| {
                 for (self.inputs.items, self.outputs.items, 1..) |input, output, j| {
                     // measure time
                     const start = try Instant.now();
+                    const ticks_before = x86_64_ticks();
                     // do the thing
-                    const got = try solution.run(self.arena, input);
-                    try self.result.outputs.append(got);
+                    const got = try solution.run(&alloc, input);
                     // measure time
+                    const ticks_after = x86_64_ticks();
                     const end = try Instant.now();
+                    // ...
+                    const ticks_elapsed = ticks_after - ticks_before;
                     const elapsed: f64 = @floatFromInt(end.since(start));
-                    const us_elapsed = elapsed / time.ns_per_us;
-                    // compare `solution(case)`
-                    if (Equal(got, output)) {
-                        print(
-                            "ok {d}:{d} | {d:.1}us\n", 
-                            .{ i, j, us_elapsed,
-                        });
-                    } else {
-                        print(
-                            "### fail {d}:{d} | {d:.1}us\n",
-                            .{ i, j, us_elapsed },
-                        );
-                        self.result.pass = false;
-                    }
+                    const us = elapsed / time.ns_per_us;
+                    const ms = elapsed / time.ns_per_ms;
+                    const prefix = blk: {
+                        if (Equal(got, output)) break :blk "ok"
+                        else {
+                            self.pass = false;
+                            break :blk "### fail";
+                        }
+                    };
+                    // compare `solution:case`
+                    print(
+                        "{s} {d}:{d} | {d:.0}ms {d:.0}us {d:.0}ns | {d} ticks\n",
+                        .{ prefix, i, j, ms, us, elapsed, ticks_elapsed },
+                    );
                 }
             }
         }

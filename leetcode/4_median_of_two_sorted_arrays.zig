@@ -43,8 +43,8 @@ fn equal_I32(x: TOutput, y: TOutput) bool {
     return x == y;
 }
 
-fn twoIndices(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput{
-    _ = arena;
+fn twoIndices(alloc: *std.mem.Allocator, x: TInput) !TOutput{
+    _ = alloc;
     const combined_len = x.nums1.len + x.nums2.len;
     if (combined_len == 0) {
         return 0;
@@ -83,8 +83,8 @@ fn twoIndices(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput{
     }
 }
 
-fn binarySearch(arena: *std.heap.ArenaAllocator, x: TInput) !TOutput {
-    _ = arena;
+fn binarySearch(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+    _ = alloc;
 
     const nums1: []const i32 = if (x.nums1.len > x.nums2.len) x.nums1 else x.nums2;
     const nums2: []const i32 = if (x.nums1.len > x.nums2.len) x.nums2 else x.nums1;
@@ -165,5 +165,5 @@ test "4 median of two sorted arrays" {
 
     try test_suite.run();
 
-    try std.testing.expect(test_suite.result.pass);
+    try std.testing.expect(test_suite.pass);
 }

@@ -5,8 +5,8 @@ fn Equal_i32(x: i32, y: i32) bool {
     return x == y;
 }
 
-fn Sum(arena: *std.heap.ArenaAllocator, x: []const i32) !i32 {
-    _ = &arena;
+fn Sum(alloc: *std.mem.Allocator, x: []const i32) !i32 {
+    _ = alloc;
     var sum: i32 = 0;
     for (x) |val| {
         sum += val;
@@ -21,6 +21,9 @@ test "sum" {
     try test_suite.inputs.append(&.{ 1, 2, 3, 4 });
     try test_suite.outputs.append(10);
 
+    try test_suite.inputs.append(&.{ 1, 2, 3, 4 });
+    try test_suite.outputs.append(10);
+
     try test_suite.inputs.append(&.{ 2, 3, 4, 5 });
     try test_suite.outputs.append(14);
 
@@ -31,11 +34,11 @@ test "sum" {
 
     try test_suite.run();
 
-    try std.testing.expect(test_suite.result.pass);
+    try std.testing.expect(test_suite.pass);
 }
 
-fn Factorial(arena: *std.heap.ArenaAllocator, x: i32) !i32 {
-    _ = &arena;
+fn Factorial(alloc: *std.mem.Allocator, x: i32) !i32 {
+    _ = alloc;
     if (x == 0) {
         return 1;
     } else if (x < 0) {
@@ -64,5 +67,5 @@ test "factorial" {
 
     try test_suite.run();
 
-    try std.testing.expect(test_suite.result.pass);
+    try std.testing.expect(test_suite.pass);
 }

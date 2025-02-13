@@ -54,18 +54,17 @@ fn Equal_Array(x: TOutput_Array, y: TOutput_Array) bool {
     return pass;
 }
 
-fn EqualizeInputLengths_Array(arena: *std.heap.ArenaAllocator, x: TInput_Array) !TOutput_Array {
-    const allocator = arena.allocator();
+fn EqualizeInputLengths_Array(alloc: *std.mem.Allocator, x: TInput_Array) !TOutput_Array {
     const are_equal = x.l1.len == x.l2.len;
     const l1_is_bigger = x.l1.len > x.l2.len;
     const max_len = if (are_equal or l1_is_bigger) x.l1.len else x.l2.len;
     // maximum theoretical capacity (999 + 99 = 1_098)
     const capacity = max_len + 1;
-    var list = try std.ArrayList(usize).initCapacity(allocator, capacity);
+    var list = try std.ArrayList(usize).initCapacity(alloc.*, capacity);
     // equalize inputs
-    var left = try std.ArrayList(usize).initCapacity(allocator, max_len);
+    var left = try std.ArrayList(usize).initCapacity(alloc.*, max_len);
     try left.appendSlice(x.l1);
-    var right = try std.ArrayList(usize).initCapacity(allocator, max_len);
+    var right = try std.ArrayList(usize).initCapacity(alloc.*, max_len);
     try right.appendSlice(x.l2);
     if (!are_equal) {
         if (l1_is_bigger) {
@@ -101,8 +100,7 @@ fn EqualizeInputLengths_Array(arena: *std.heap.ArenaAllocator, x: TInput_Array) 
     return try list.toOwnedSlice();
 }
 
-fn SumThenCarryRemainders_Array(arena: *std.heap.ArenaAllocator, x: TInput_Array) !TOutput_Array {
-    const allocator = arena.allocator();
+fn SumThenCarryRemainders_Array(alloc: *std.mem.Allocator, x: TInput_Array) !TOutput_Array {
     var sum: usize = 0;
     var power: usize = x.l1.len;
     for (0..x.l1.len) |i| {
@@ -119,7 +117,7 @@ fn SumThenCarryRemainders_Array(arena: *std.heap.ArenaAllocator, x: TInput_Array
     // maximum theoretical capacity (999 + 99 = 1_098) == (max_len + 1)
     // then will reverse by appending in reverse order to the end
     const capacity = (max_len + 1) * 2;
-    var list = try std.ArrayList(usize).initCapacity(allocator, capacity);
+    var list = try std.ArrayList(usize).initCapacity(alloc.*, capacity);
     power = max_len + 1;
     while (power > 0) {
         power -= 1;
@@ -162,7 +160,7 @@ test "2 add two number arrays" {
 
     try test_suite.run();
 
-    try std.testing.expect(test_suite.result.pass);
+    try std.testing.expect(test_suite.pass);
 }
 
 fn printList(x: TOutput_List) void {
@@ -201,7 +199,7 @@ const ListNode = struct {
     next: ?*ListNode,
 };
 
-fn initList(alloc: std.mem.Allocator, arr: []const i32) !*ListNode {
+fn initList(alloc: *std.mem.Allocator, arr: []const i32) !*ListNode {
     if (arr.len == 0) unreachable;
     const head: *ListNode = try alloc.create(ListNode);
     head.* = ListNode{ .val = arr[0], .next = null };
@@ -216,7 +214,7 @@ fn initList(alloc: std.mem.Allocator, arr: []const i32) !*ListNode {
     return head;
 }
 
-fn appendList(alloc: std.mem.Allocator, node: *ListNode, val: i32) !*ListNode {
+fn appendList(alloc: *std.mem.Allocator, node: *ListNode, val: i32) !*ListNode {
     const new = try alloc.create(ListNode);
     new.* = ListNode{ .val = val, .next = null };
     node.next = new;
@@ -230,8 +228,7 @@ const TInput_List = struct {
 
 const TOutput_List = *ListNode;
 
-fn equalizeInputLengths_List(arena: *std.heap.ArenaAllocator, x: TInput_List) !TOutput_List {
-    const alloc = arena.allocator();
+fn equalizeInputLengths_List(alloc: *std.mem.Allocator, x: TInput_List) !TOutput_List {
     var left = x.l1;
     var right = x.l2;
     while (left.next != null and right.next != null) {
@@ -308,8 +305,7 @@ fn sumList(x: *ListNode) [2]i32 {
     return .{ len, sum };
 }
 
-fn sumThenCarryRemainders_List(arena: *std.heap.ArenaAllocator, x: TInput_List) !TOutput_List {
-    const alloc = arena.allocator();
+fn sumThenCarryRemainders_List(alloc: *std.mem.Allocator, x: TInput_List) !TOutput_List {
     // count len
     const l1_result: [2]i32 = sumList(x.l1);
     const l1_len = l1_result[0];
@@ -372,25 +368,25 @@ test "2 add two number lists" {
     var test_suite = TestSuite(TInput_List, TOutput_List, equalList, "add lists").init();
     defer test_suite.deinit();
 
-    const alloc = test_suite.arena.allocator();
+    var alloc = test_suite.arena.allocator();
 
     try test_suite.inputs.append(.{
-        .l1 = try initList(alloc, &.{ 2, 4, 3 }),
-        .l2 = try initList(alloc, &.{ 5, 6, 4 }),
+        .l1 = try initList(&alloc, &.{ 2, 4, 3 }),
+        .l2 = try initList(&alloc, &.{ 5, 6, 4 }),
     });
-    try test_suite.outputs.append(try initList(alloc, &.{ 7, 0, 8 }));
+    try test_suite.outputs.append(try initList(&alloc, &.{ 7, 0, 8 }));
 
     try test_suite.inputs.append(.{
-        .l1 = try initList(alloc, &.{0}),
-        .l2 = try initList(alloc, &.{0}),
+        .l1 = try initList(&alloc, &.{0}),
+        .l2 = try initList(&alloc, &.{0}),
     });
-    try test_suite.outputs.append(try initList(alloc, &.{0}));
+    try test_suite.outputs.append(try initList(&alloc, &.{0}));
 
     try test_suite.inputs.append(.{
-        .l1 = try initList(alloc, &.{ 9, 9, 9, 9, 9, 9, 9 }),
-        .l2 = try initList(alloc, &.{ 9, 9, 9, 9 }),
+        .l1 = try initList(&alloc, &.{ 9, 9, 9, 9, 9, 9, 9 }),
+        .l2 = try initList(&alloc, &.{ 9, 9, 9, 9 }),
     });
-    try test_suite.outputs.append(try initList(alloc, &.{ 8, 9, 9, 9, 0, 0, 0, 1 }));
+    try test_suite.outputs.append(try initList(&alloc, &.{ 8, 9, 9, 9, 0, 0, 0, 1 }));
 
     try test_suite.solutions.appendSlice(&.{
         .{ .run = &sumThenCarryRemainders_List },
@@ -401,5 +397,5 @@ test "2 add two number lists" {
 
     try test_suite.run();
 
-    try std.testing.expect(test_suite.result.pass);
+    try std.testing.expect(test_suite.pass);
 }
