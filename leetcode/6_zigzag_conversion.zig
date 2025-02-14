@@ -65,6 +65,23 @@ fn equalString(x: []const u8, y: []const u8) bool {
 // [?] should skip the middle logic if `rows` is `2`
 //  'X' 'X' 'X' 'X'  |  0   2   4   6  |  ...
 //    'X' 'X' 'X'    |    1   3   5    |  ...
+// [?] jump sizes are:
+//  ■       +8        ■
+//  ■     +6     ■ +2 ■
+//  ■   +4   ■   +4   ■
+//  ■ +2 ■     +6     ■
+//  ■       +8        ■
+// [?] or for per "row index" RI and "current vertical pillar index" CVPI case:
+//               CVPI is 0*gap    CVPI is 1*gap
+//                      v             v
+//  prepass  { RI=0  |  ■          +8 ■ }
+//             RI=1  |  ■     +6 ■ +8 ■  
+//             RI=2  |  ■   +4 ■   +8 ■  
+//             RI=3  |  ■ +2 ■     +8 ■  
+//  postpass { RI=4  |  ■          +8 ■ }
+//                      ^      ^      ^
+//                  first    first    second
+//                 in row     jump    jump
 
 fn try1(alloc: *std.mem.Allocator, x: TInput) !TOutput {
     const input = x.s;
