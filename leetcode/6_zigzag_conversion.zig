@@ -50,19 +50,19 @@ const TInput = struct {
 const TOutput = []const u8;
 
 fn equalString(x: []const u8, y: []const u8) bool {
-    print("\n\"{s}\"\n\"{s}\"\n", .{x, y});
+    //print("\n\"{s}\"\n\"{s}\"\n", .{x, y});
     return std.mem.eql(u8, x, y);
 }
 
-// [?] `gap_size` is `4` if `rows` is `3`
-// [?] `gap_size` is `6` if `rows` is `4`
-// [?] `gap_size` is `8` if `rows` is `5`
+// [?] `gap_size` is `4` if `n_rows` is `3`
+// [?] `gap_size` is `6` if `n_rows` is `4`
+// [?] `gap_size` is `8` if `n_rows` is `5`
 //  'X'         'X'  |  0      >8<        16  |  prepass: 0, >8<, ...
 //  'X'      'X''X'  |  1     7 9      15 17  |  1; {7, 9};  {15, 17}; ...
 //  'X'   'X'   'X'  |  2   6   10   14   18  |  2; {6, 10}; {14, 18}; ...
 //  'X''X'      'X'  |  3 5     11 13     19  |  3; {5, 11}; {13, 19}; ...
 //  'X'         'X'  |  4       12        20  |  postpass: 4, 12, ...
-// [?] should skip the middle logic if `rows` is `2`
+// [?] should skip the middle logic if `n_rows` is `2`
 //  'X' 'X' 'X' 'X'  |  0   2   4   6  |  ...
 //    'X' 'X' 'X'    |    1   3   5    |  ...
 // [?] jump sizes are:
@@ -70,7 +70,7 @@ fn equalString(x: []const u8, y: []const u8) bool {
 //  ■     +6     ■ +2 ■
 //  ■   +4   ■   +4   ■
 //  ■ +2 ■     +6     ■
-//  ■       +8        ■
+//  ■        +8       ■
 // [?] or for per "row index" RI and "current vertical pillar index" CVPI case:
 //               CVPI is 0*gap    CVPI is 1*gap
 //                      v             v
@@ -83,27 +83,28 @@ fn equalString(x: []const u8, y: []const u8) bool {
 //                  first    first    second
 //                 in row     jump    jump
 
-fn try1(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+fn firstPass(alloc: *std.mem.Allocator, x: TInput) !TOutput {
     const input = x.s;
-    const rows = x.numRows;
-    if (rows == 1) return input;
-    var output: []u8 = try alloc.alloc(u8, input.len);
-    const gap_size = rows + rows - 2;
+    const n = input.len;
+    const n_rows = x.numRows;
+    if (n_rows < 2 or n_rows >= n) return input;
+    var output: []u8 = try alloc.alloc(u8, n);
+    const gap_size = n_rows + n_rows - 2;
     // prepass
     var output_i: usize = 0;
     var input_i: usize = 0;
     // `row_i` is 0
-    for (0..input.len) |i| {
+    for (0..n) |i| {
         input_i = i * gap_size;
-        if (input_i >= input.len) break;
+        if (input_i >= n) break;
         //print("input_i {d}\n", .{input_i});
         output[output_i] = input[input_i];
         output_i += 1;
     }
     // middle part
-    const stop_row_i = rows - 1;
+    const stop_row_i = n_rows - 1;
     var row_i: usize = 0;
-    // if `rows` is 2, then it breaks immediately
+    // if `n_rows` is 2, then it breaks immediately
     var first_jump = gap_size;
     //var second_jump: usize = 0;
     while (true) {
@@ -112,32 +113,57 @@ fn try1(alloc: *std.mem.Allocator, x: TInput) !TOutput {
         first_jump -= 2;
         //second_jump += 2;
         const first_in_row_i = row_i;
-        if (first_in_row_i >= input.len) break;
+        if (first_in_row_i >= n) break;
         output[output_i] = input[first_in_row_i];
         output_i += 1;
-        for (0..input.len) |column_i| {
+        for (0..n) |column_i| {
             const pillar_i = column_i * gap_size;
             const first_i = row_i + pillar_i + first_jump;
-            if (first_i >= input.len) break;
+            if (first_i >= n) break;
             output[output_i] = input[first_i];
             output_i += 1;
             const second_i = row_i + pillar_i + gap_size;
             // or `first_jump + second_jump` instead of `gap_size`
-            if (second_i >= input.len) break;
+            if (second_i >= n) break;
             output[output_i] = input[second_i];
             output_i += 1;
         }
     }
     // postpass
-    // `row_i` is `rows - 1` after the previous while loop overshoot
-    for (0..input.len) |i| {
+    // `row_i` is `n_rows - 1` after the previous while loop overshoot
+    for (0..n) |i| {
         input_i = row_i + (i * gap_size);
-        if (input_i >= input.len) break;
+        if (input_i >= n) break;
         //print("input_i {d}\n", .{input_i});
         output[output_i] = input[input_i];
         output_i += 1;
     }
     return output;
+}
+
+fn actualZigzag(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+    if (x.numRows < 2 or x.numRows >= x.s.len) return x.s;
+    const TList = std.ArrayList(u8);
+    var zigzags = try alloc.alloc(TList, x.numRows);
+    for (zigzags) |*list| list.* = TList.init(alloc.*);
+    var i: usize = 0;
+    while (i < x.s.len) {
+        var j: usize = 0;
+        while (j < x.numRows and i < x.s.len) {
+            try zigzags[j].append(x.s[i]);
+            i += 1;
+            j += 1;
+        }
+        j = x.numRows - 2;
+        while (j > 0 and i < x.s.len) {
+            try zigzags[j].append(x.s[i]);
+            i += 1;
+            j -= 1;
+        }
+    }
+    var answer = TList.init(alloc.*);
+    for (zigzags) |list| try answer.appendSlice(list.items);
+    return answer.items;
 }
 
 test "6" {
@@ -156,8 +182,18 @@ test "6" {
     try test_suite.inputs.append(.{ .s = "ABABABABAB", .numRows = 2 });
     try test_suite.outputs.append("AAAAABBBBB");
 
+    try test_suite.inputs.append(.{ .s = "ABABABABAB", .numRows = 10 });
+    try test_suite.outputs.append("ABABABABAB");
+
+    try test_suite.inputs.append(.{ .s = "AB", .numRows = 2 });
+    try test_suite.outputs.append("AB");
+
+    try test_suite.inputs.append(.{ .s = "ABC", .numRows = 3 });
+    try test_suite.outputs.append("ABC");
+
     try test_suite.solutions.appendSlice(&.{
-        .{ .run = &try1 },
+        .{ .run = &firstPass },
+        .{ .run = &actualZigzag },
     });
 
     try test_suite.run();
