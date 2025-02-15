@@ -36,7 +36,7 @@ fn equalInteger(x: TInput, y: TOutput) bool {
     return x == y;
 }
 
-fn try1(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+fn remainderDivisionOverflowCheck(alloc: *std.mem.Allocator, x: TInput) !TOutput {
     _ = alloc;
     var integer = x;
     const upper_limit: isize = @divTrunc(std.math.maxInt(TInput), 10);
@@ -69,7 +69,7 @@ test "7" {
     try test_suite.outputs.append(21);
 
     try test_suite.solutions.appendSlice(&.{
-        .{ .run = &try1 },
+        .{ .run = &remainderDivisionOverflowCheck },
     });
 
     try test_suite.run();
