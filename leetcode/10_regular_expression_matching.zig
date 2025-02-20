@@ -52,143 +52,217 @@ fn equalBool(x: bool, y: bool) bool {
     return x == y;
 }
 
-//// doesn't work, as it assumes '*' will match to the string end
-//fn naive(alloc: *std.mem.Allocator, x: TInput) !TOutput {
-//    _ = alloc;
-//    var i_p: usize = 0;
-//    var i_s: usize = 0;
-//    for (x.s) |ch| {
-//        const p = x.p[i_p];
-//        switch (p) {
-//            'a'...'z' => {
-//                if (ch != p) return false;
-//                i_p += 1;
-//            },
-//            '.' => {
-//                i_p += 1;
-//            },
-//            '*' => continue,
-//            else => unreachable, // p contains only lowercase English letters
-//        }
-//    }
-//    return true;
-//}
+// when an element precedence for '*' pattern is always guaranteed, there are
+// only a need to handle the following cases, when iterating the pattern:
+// | .   |
+// | .*  |
+// | .*. |
+// | .*a |
+// | a*a |
+// | a*. |
+// | a*  |
+// | a   |
+// which can be generalized with switch-case logic on 'a'...'z' and '.' to
+// | c   |
+// | c*  |
+// | c*c |
+// from the algorithm's nature of jumping 2 indices at once to handle '*'
 
-const FuzzyPattern = enum(u2) {
-    // `.clear` pattern validation is the same as for `.end`
-    //clear,// _ x _
-            //   0 p.len
-    // should match from left to right sequentially, without skips
-    end,    // _ x * _
-            //   0 1
-    // should increase string index and reset pattern index on pattern mismatch
-    around, // _ * x * _
-            //     1 2
-    // should determine whether the remaining pattern chunk can be accomodated
-    // at the string end and then match every pattern character sequentially
-    start,  // _ * x _ 
-            //     1 p.len
+// this allows for the algorithm to decrement the pattern position, when it
+// doesn't match and to build a state decision tree with progressive shaker
+// motion
+
+// in this case the end result could have of 3 outcomes:
+// - a try to decrement the pattern index to out of bounds position
+//     (string still has chars)                                     | mismatch
+// - a try to increment the string index to out of bounds position
+//     (pattern still has chars)                                    | mismatch
+// - a try to increment both the string and the pattern to out of bounds
+//     position                                                     | match
+
+// to create the decrement-increment pattern pass motion it could be either:
+// - parsed to an array of state structs
+// - be dynamically discovered when such motion happens
+//     (which doesn't work when there's a need to retract twice or more)
+// - be dynamically discovered and parsed, when '*' pattern occurs
+
+//const FuzzyPattern = enum(u2) {
+//    end,    // x.* , xa
+//    around, // .*x.*
+//    start,  // .*x
+//};
+//
+//const Fuzzy = struct {
+//    i_s: usize,
+//    i_p: usize,
+//    i_next: usize,
+//    pattern: FuzzyPattern,
+//    ch: u8,
+//};
+
+// - matching causes both `string` and `pattern` indices to increment
+// - both incrementing and decrementing `pattern` causes '*' pattern check to
+// overshoot or undershoot it
+// - shaker matching alorithm only increments string, but both increments and
+// decrements the pattern, which causes the following overflow (>) and
+// underflow (<) states:
+// ---------------------------------
+// string  |   | > |   | > |   | > |
+// pattern |   |   | > | > | < | < |
+// ---------------------------------
+// №       | 1 | 2 | 3 | 4 | 5 | 6 |
+// ---------------------------------
+// - these cases should be handled according to the list:
+// 1) perform main body logic
+// 2) return *all remaining `pattern` chars are fuzzy*
+// 3) decrement-match the pattern until (5)th case happens or there's a match
+// 4) return true
+// 5) return false
+// 6) return false; but MUST NOT BE POSSIBLE, as the pattern index will either
+// constantly decrement on mismatch causing (5)th case or eventually match and
+// both `string` and `pattern` will overflow causing (4)th case
+
+// didn't figure out how to handle ".*a*b*c*" sequence without dynamically
+// allocating collections to handle ordered fuzzy pattern stacking, so
+//```fn fuzzyWindowMatching(alloc: *std.mem.Allocator, x: TInput) !TOutput {```
+// like in solution 10_2 isn't possible right now
+// at the time solutions seem to be to perform a more aggressive than in
+// solution 10_2 shaker motion in order to sometimes retract 2 or more indices
+// to rematch the pattern AND:
+// - to store a stack for adjacent `Fuzzy` structs with runtime parsing
+// - to prepass the pattern in order to pregen linked list of `Fuzzy` structs
+// with an additional field or a union type for .ch field to store multiple
+// fuzzy patterns
+
+const Pattern = struct {
+    ch: u8,
+    fuzzy: bool,
 };
 
-const Fuzzy = struct {
-    i_s: usize, // track string index where clear subpattern matching started
-    i_p: usize, // track where clear subpattern itself is
-    i_next: usize, // next fuzzy border index: 0 at the execution beginning,
-    // pattern.len or where '*' resides
-    pattern: FuzzyPattern,
-};
-
-fn fuzzyWindowMatching(alloc: *std.mem.Allocator, x: TInput) !TOutput {
-    _ = alloc;
-    const string = x.s;
-    const pattern = x.p;
+fn shakerMatchingPrepass(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+    // edge case
+    if (x.p.len == 0) return x.s.len == 0;
+    // prepass
+    var pattern_container = try std.ArrayList(Pattern).initCapacity(alloc.*, x.p.len);
+    for (x.p) |p_ch| {
+        if (p_ch == '*') {
+            const i_last = pattern_container.items.len - 1;
+            pattern_container.items[i_last].fuzzy = true;
+        } else {
+            try pattern_container.append(.{ .ch = p_ch, .fuzzy = false });
+        }
+    }
+    // ...
+    //print("\n", .{}); for (pattern_container.items) |p| print("{}\n", .{p}); print("\n", .{});
+    // ...
     var i_p: usize = 0;
     var i_s: usize = 0;
-    var fuzzy = Fuzzy{ .i_s = 0, .i_p = 0, .i_next = 0, .pattern = .end };
-    //print("\n\n", .{});
+    const pattern = pattern_container.items;
+    const string = x.s;
+    // edge case
+    if (string.len == 0) for (pattern) |p| if (!p.fuzzy) return false;
+    // main body
     while (true) {
-        //print("while (true)\n", .{});
-        const pattern_overflow = i_p == pattern.len;
-        const string_overflow = i_s == string.len;
-        //print("  pattern_overflow {}\n", .{pattern_overflow});
-        //print("  string_overflow {}\n", .{string_overflow});
-        //print("  string[{d}..] \"{s}\" | pattern[{d}..] \"{s}\"\n", .{i_s, string[i_s..], i_p, pattern[i_p..]});
-        //print("  fuzzy.i_p {d} | fuzzy.i_next {d} | fuzzy.pattern {}\n", .{fuzzy.i_p, fuzzy.i_next, fuzzy.pattern});
-        if (string_overflow and pattern_overflow) return true;
-        //if (string_overflow) return pattern[i_p] == '*'; // somehow, it is handled (didn't bother checking why xd)
-        if (pattern_overflow) return false;
-        // determine fuzzy pattern by handling `i_p` equal to 0, '*' or pattern.len
-        if (i_p == fuzzy.i_next) {
-            //print("  if (i_p == fuzzy.i_next)\n", .{});
-            // remember where the check in string started
-            fuzzy.i_s = i_s;
-            // move fuzzy border
-            while (true) {
-                fuzzy.i_next += 1;
-                if (fuzzy.i_next == pattern.len) break;
-                if (pattern[fuzzy.i_next] == '*') break;
+        //print("  while (true)\n", .{});
+        const string_overflow = i_s >= string.len;
+        const pattern_overflow = i_p >= pattern.len;
+        //print("    string_overflow {} | pattern_overflow {}\n", .{string_overflow, pattern_overflow});
+        //print("    i_s {d} | i_p {}\n", .{i_s, i_p});
+        if (string_overflow and pattern_overflow) return true; // (4)th
+        if (string_overflow) { // (2)nd
+            while (i_p < pattern.len) { 
+                if (!pattern[i_p].fuzzy) return false;
+                i_p += 1;
             }
-            if (pattern[i_p] == '*') i_p += 1;
-            if (i_p == pattern.len) return pattern[pattern.len - 1] == '*'; // pattern was exhausted, but could match any string ending
-            fuzzy.i_p = i_p;
-            const start_is_fuzzy = fuzzy.i_p != 0;
-            const end_is_fuzzy = fuzzy.i_next != pattern.len;
-            if (start_is_fuzzy and end_is_fuzzy) fuzzy.pattern = .around
-            else if (start_is_fuzzy) fuzzy.pattern = .start
-            // either end_is_fuzzy or !(start_is_fuzzy and end_is_fuzzy)
-            else fuzzy.pattern = .end;
-            //print("    string[{d}..] \"{s}\" | pattern[{d}..] \"{s}\"\n", .{i_s, string[i_s..], i_p, pattern[i_p..]});
-            //print("    fuzzy.i_p {d} | fuzzy.i_next {d} | fuzzy.pattern {}\n", .{fuzzy.i_p, fuzzy.i_next, fuzzy.pattern});
+            return true;
         }
+        //print("pattern.len {d} | i_p {d}\n", .{pattern.len, i_p});
+        if (pattern_overflow) while (true) { // (3)rd
+            // retract continuously
+            if (i_p == 0) return false; // pattern underflow; (5)th
+            i_p -= 1;
+            const ch = string[i_s];
+            const p = pattern[i_p];
+            if (p.ch == ch or p.ch == '.' or p.fuzzy) {
+                break;
+            }
+        };
+        //print("pattern.len {d} | i_p {d}\n", .{pattern.len, i_p});
+        // ...
         const ch = string[i_s];
         const p = pattern[i_p];
-        //print("  switch ({c})\n", .{p});
-        // match the clear pattern block in text
-        if (fuzzy.pattern == .start) {
-            // match the sequence at the end
-            // check if string end accomodates end pattern by length
-            const end_pattern_len = pattern.len - fuzzy.i_p;
-            const i_string_end = string.len - end_pattern_len;
-            if (i_string_end < i_s) return false;
-            // ...
-            i_s = i_string_end;
-            while (i_p < pattern.len) {
-                const end_ch = string[i_s];
-                const end_p = pattern[i_p];
-                if (end_p != '.' and end_ch != end_p) return false;
-                i_s += 1;
-                i_p += 1;
-            }
-        } else switch (p) {
-            'a'...'z' => {
-                if (ch == p) {
-                    i_p += 1;
-                    i_s += 1;
-                } else if (fuzzy.pattern == .around) {
-                    // reset the clear block of the pattern
-                    i_p = fuzzy.i_p; // full reset of the pattern position
-                    fuzzy.i_s += 1;
-                    i_s = fuzzy.i_s; // reset the string position to the
-                    // incremented fuzzy state (i.e. try next position)
-                } else return false;
-            },
-            '.' => {
-                // skip one; any character will do
-                i_p += 1;
-                i_s += 1;
-            },
-            else => unreachable, // contains only lowercase English letters
+        if (p.ch == ch or p.ch != '.' or p.fuzzy) { // (1)st
+            i_p += 1;
+            i_s += 1;
+        } else {
+            if (i_p == 0) return false; // pattern underflow; (5)th
+            i_p -= 1;
         }
-        //print("    string[{d}..] \"{s}\" | pattern[{d}..] \"{s}\"\n", .{i_s, string[i_s..], i_p, pattern[i_p..]});
     }
     unreachable;
+}
+
+// there are additional memory required to match patterns for combinatorics of
+// cases "c", "a*c", "b*c" and "a*b*c" in "a*b*c"
+// .s = "aa", .p = "a"
+// .s = "cab", .p = "a*b*cab"
+// .s = "cb", .p = "a*b*cab"
+// .s = "ce", .p = "a*b*ce"
+// these combinations could be obtained by bitfield counting on each decrement
+// recombination
+
+fn dynamicProgramming(alloc: *std.mem.Allocator, x: TInput) !TOutput {
+    const p = x.p;
+    const s = x.s;
+    if (p.len == 0) return s.len == 0;
+    var dp: [][]bool = try alloc.alloc([]bool, s.len + 1);
+    for (dp) |*dpi| dpi.* = try alloc.alloc(bool, p.len + 1);
+    dp[0][0] = true;
+    for (2..p.len + 1) |j| {
+        if (p[j - 1] == '*') {
+            //const match_0_times = dp[0][j - 2]; // match ".*" in "abc.*" 0 times when "abc" also matches
+            //dp[0][j] = match_0_times; // for empty `string` and 2 chars before '*' char in `pattern`
+            // (+ and - are the attention to the inputs, ? is the attention to the output)
+            //     _ a *            _ a *
+            //   -------          -------
+            // _ | + 0 ?   =>   _ | 1 0 1
+            // a | 0 0 0        a | 0 0 0
+            // a | 0 0 0        a | 0 0 0
+            dp[0][j] = dp[0][j - 2]; // for empty `string` and 2 chars before '*' char in `pattern`
+        }
+    }
+    for (1..s.len + 1) |i| {
+        for (1..p.len + 1) |j| {
+            if (p[j - 1] == '*') {
+                //const match_0_times = dp[i][j - 2]; // 2 chars before '*' char in `pattern`
+                //const exact_match = s[i - 1] == p[j - 2] or p[j - 2] == '.';
+                //const match_0_times_in_lesser_string = dp[i - 1][j]; // in string with 1 less char
+                //dp[i][j] = match_0_times or (exact_match and match_0_times_in_lesser_string);
+                //     _ a *                       _ a *
+                //   -------                     -------
+                // _ | 1 0 +   , 'a'=='a' =>   _ | 1 0 1
+                // a | - 1 ?                   a | 0 1 1
+                // a | 0 0 0                   a | 0 0 0
+                dp[i][j] = dp[i][j - 2] or ((s[i - 1] == p[j - 2] or p[j - 2] == '.') and dp[i - 1][j]);
+            } else {
+                //const previous_matched = dp[i - 1][j - 1]; // 1 char less for both `pattern` and `string`
+                //const exact_match = s[i - 1] == p[j - 1] or p[j - 1] == '.';
+                //dp[i][j] = previous_matched and exact_match;
+                //     _ a *                       _ a *
+                //   -------                     -------
+                // _ | + 0 1   , 'a'=='a' =>   _ | 1 0 1
+                // a | 0 ? 0                   a | 0 1 0
+                // a | 0 0 0                   a | 0 0 0
+                dp[i][j] = dp[i - 1][j - 1] and (s[i - 1] == p[j - 1] or p[j - 1] == '.');
+            }
+        }
+    }
+    return dp[s.len][p.len];
 }
 
 test "10" {
     var test_suite = TestSuite(TInput, TOutput, equalBool, "regular expression matching").init();
     defer test_suite.deinit();
-
-    // BEGIN original test cases
 
     try test_suite.inputs.append(.{ .s = "aa", .p = "a", });
     try test_suite.outputs.append(false);
@@ -199,91 +273,44 @@ test "10" {
     try test_suite.inputs.append(.{ .s = "ab", .p = ".*", });
     try test_suite.outputs.append(true);
 
-    // END original test cases
-
-    try test_suite.inputs.append(.{ .s = "x", .p = "x", });
+    try test_suite.inputs.append(.{ .s = "abbbbb", .p = ".*", });
     try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "x", .p = "x*", });
+    try test_suite.inputs.append(.{ .s = "abbbbb", .p = "a.*", });
     try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "x", .p = "*x", });
+    try test_suite.inputs.append(.{ .s = "abbbbb", .p = "ab.*", });
     try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "x", .p = "*x*", });
+    try test_suite.inputs.append(.{ .s = "abbbbb", .p = ".*b", });
     try test_suite.outputs.append(true);
-
-    try test_suite.inputs.append(.{ .s = "yx", .p = "x", });
+    try test_suite.inputs.append(.{ .s = "abbbbb", .p = ".*", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "abbbbb", .p = "a*b*", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "aaaaabbbbb", .p = "a*b*", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "", .p = "", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "", .p = ".*", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "", .p = "a*b*", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "b", .p = "a*b*", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "a", .p = "a*b*", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "c", .p = "a*b*c", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "cab", .p = "a*b*cab", });
+    try test_suite.outputs.append(true);
+    try test_suite.inputs.append(.{ .s = "cb", .p = "a*b*cab", });
     try test_suite.outputs.append(false);
-    try test_suite.inputs.append(.{ .s = "yx", .p = "x*", });
-    try test_suite.outputs.append(false);
-    try test_suite.inputs.append(.{ .s = "xy", .p = "*x", });
-    try test_suite.outputs.append(false);
-
-    try test_suite.inputs.append(.{ .s = "cab", .p = "c*a*b", });
+    try test_suite.inputs.append(.{ .s = "ce", .p = "a*b*ce", });
     try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "aab", .p = "c*a*b", });
-    try test_suite.outputs.append(false);
-
-    try test_suite.inputs.append(.{ .s = "ccaabb", .p = "c*a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "ccaabb", .p = "c*a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "cabb", .p = "c*a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "ccabb", .p = "c*a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "caba", .p = "c*a*b", });
-    try test_suite.outputs.append(false);
-    try test_suite.inputs.append(.{ .s = "acab", .p = "c*a*b", });
-    try test_suite.outputs.append(false);
-    try test_suite.inputs.append(.{ .s = "acaba", .p = "c*a*b", });
-    try test_suite.outputs.append(false);
-
-    try test_suite.inputs.append(.{ .s = "cccab", .p = "c.*a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "cccab", .p = "c*.a*b", }); // 21
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "cccab", .p = "c.*.a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "cccab", .p = "c*..a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "cccab", .p = "c..*a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "cccab", .p = "..c*a*b", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "cccab", .p = ".c.*a*b", });
-    try test_suite.outputs.append(true);
-
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b*c.", }); // 27
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*bc*.", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*bc.*.", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*bc*..", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*bc..*", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b..c*", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b.c.*", });
-    try test_suite.outputs.append(true);
-
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b.c*", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b.*c", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b.*.c", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b..*c", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b*..c", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b*c..", });
-    try test_suite.outputs.append(true);
-    try test_suite.inputs.append(.{ .s = "abccc", .p = "a*b*.c.", });
+    try test_suite.inputs.append(.{ .s = "c", .p = "ca*b*", });
     try test_suite.outputs.append(true);
 
     try test_suite.solutions.appendSlice(&.{
-        .{ .run = &fuzzyWindowMatching },
+        //.{ .run = &shakerMatchingPrepass },
+        .{ .run = &dynamicProgramming },
     });
 
     try test_suite.run();

@@ -74,21 +74,20 @@ pub fn TestSuite(
                     const ticks_after = x86_64_ticks();
                     const end = try Instant.now();
                     // ...
-                    const ticks_elapsed = ticks_after - ticks_before;
-                    const elapsed: f64 = @floatFromInt(end.since(start));
-                    const us = elapsed / time.ns_per_us;
-                    const ms = elapsed / time.ns_per_ms;
+                    const elapsed_ticks = ticks_after - ticks_before;
+                    const elapsed_ns = end.since(start);
+                    const ns = @rem(elapsed_ns, 1000);
+                    const us = @divTrunc(elapsed_ns, 1000);
+                    const ms = @divTrunc(us, 1000);
+                    const s = @divTrunc(ms, 1000);
                     const prefix = blk: {
-                        if (Equal(got, output)) break :blk "ok"
-                        else {
-                            self.pass = false;
-                            break :blk "### fail";
-                        }
+                        if (Equal(got, output)) break :blk "ok";
+                        self.pass = false;
+                        break :blk "\\\\\\ fail";
                     };
-                    // compare `solution:case`
                     print(
-                        "{s} {d}:{d} | {d:.0}ms {d:.0}us {d:.0}ns | {d} ticks\n",
-                        .{ prefix, i, j, ms, us, elapsed, ticks_elapsed },
+                        "{s}   {d}:{d}   {d}.{d}'{d}\"{d}   {d}`\n",
+                        .{ prefix, i, j, s, ms, us, ns, elapsed_ticks },
                     );
                 }
             }
