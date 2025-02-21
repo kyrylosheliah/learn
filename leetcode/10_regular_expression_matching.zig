@@ -72,19 +72,18 @@ fn equalBool(x: bool, y: bool) bool {
 // doesn't match and to build a state decision tree with progressive shaker
 // motion
 
-// in this case the end result could have of 3 outcomes:
-// - a try to decrement the pattern index to out of bounds position
+// in this case the end result could have 3 outcomes:
+// - an attempt to decrement the pattern index to out of bounds position
 //     (string still has chars)                                     | mismatch
-// - a try to increment the string index to out of bounds position
+// - an attempt to increment the string index to out of bounds position
 //     (pattern still has chars)                                    | mismatch
-// - a try to increment both the string and the pattern to out of bounds
+// - an attempt to increment both the string and the pattern to out of bounds
 //     position                                                     | match
 
 // to create the decrement-increment pattern pass motion it could be either:
 // - parsed to an array of state structs
 // - be dynamically discovered when such motion happens
 //     (which doesn't work when there's a need to retract twice or more)
-// - be dynamically discovered and parsed, when '*' pattern occurs
 
 //const FuzzyPattern = enum(u2) {
 //    end,    // x.* , xa
@@ -103,8 +102,8 @@ fn equalBool(x: bool, y: bool) bool {
 // - matching causes both `string` and `pattern` indices to increment
 // - both incrementing and decrementing `pattern` causes '*' pattern check to
 // overshoot or undershoot it
-// - shaker matching alorithm only increments string, but both increments and
-// decrements the pattern, which causes the following overflow (>) and
+// - shaker matching alorithm only increments string, but both increment and
+// decrement the pattern, which causes the following overflow (>) and
 // underflow (<) states:
 // ---------------------------------
 // string  |   | > |   | > |   | > |
@@ -121,18 +120,6 @@ fn equalBool(x: bool, y: bool) bool {
 // 6) return false; but MUST NOT BE POSSIBLE, as the pattern index will either
 // constantly decrement on mismatch causing (5)th case or eventually match and
 // both `string` and `pattern` will overflow causing (4)th case
-
-// didn't figure out how to handle ".*a*b*c*" sequence without dynamically
-// allocating collections to handle ordered fuzzy pattern stacking, so
-//```fn fuzzyWindowMatching(alloc: *std.mem.Allocator, x: TInput) !TOutput {```
-// like in solution 10_2 isn't possible right now
-// at the time solutions seem to be to perform a more aggressive than in
-// solution 10_2 shaker motion in order to sometimes retract 2 or more indices
-// to rematch the pattern AND:
-// - to store a stack for adjacent `Fuzzy` structs with runtime parsing
-// - to prepass the pattern in order to pregen linked list of `Fuzzy` structs
-// with an additional field or a union type for .ch field to store multiple
-// fuzzy patterns
 
 const Pattern = struct {
     ch: u8,
@@ -210,6 +197,29 @@ fn shakerMatchingPrepass(alloc: *std.mem.Allocator, x: TInput) !TOutput {
 // .s = "ce", .p = "a*b*ce"
 // these combinations could be obtained by bitfield counting on each decrement
 // recombination
+
+//const SomePattern = union(u2) {
+//    fuzzy: u8,
+//    fuzzyMany: []struct{ch: u8, active:bool},
+//    clear: u8
+//};
+
+// didn't figure out how to handle ".*a*b*c*" sequence without dynamically
+// allocating collections to handle ordered fuzzy pattern stacking, so
+//```fn fuzzyWindowMatching(alloc: *std.mem.Allocator, x: TInput) !TOutput {```
+// like in solution 10_2 isn't possible right now
+// at the time solutions seem to be to perform a more aggressive than in
+// solution 10_2 shaker motion in order to sometimes retract 2 or more indices
+// to rematch the pattern AND:
+// - to store a stack for adjacent `Fuzzy` structs with runtime parsing
+// - to prepass the pattern in order to pregen linked list of `Fuzzy` structs
+// with an additional field or a union type for .ch field to store multiple
+// fuzzy patterns
+// - to make the decision to include the symbol >0 times locally twice (first
+// time when first encountered, second time when rectracted to) and the
+// guarantee of performing Kernighan's algorithm on such adjacent fuzzy '*'
+// patterns would be to never retract further when the pattern was already
+// retracted to once ... < TODO ?
 
 fn dynamicProgramming(alloc: *std.mem.Allocator, x: TInput) !TOutput {
     const p = x.p;
