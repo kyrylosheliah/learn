@@ -15,8 +15,8 @@ public static class Solver
         if (targetCountIndex == -1)
             return -1;
 
-        //var total = population[0] + population[1] + population[2];
-        var total = population.Sum();
+        var total = population[0] + population[1] + population[2];
+        //var total = population.Sum();
 
         // check if the problem is already solved
         if (population[targetCountIndex] == total)
@@ -31,10 +31,11 @@ public static class Solver
             return -1;
 
         // extract two other color indices
-        var others = new List<int>();
+        Span<int> others = stackalloc int[2];
+        int i_others = 0;
         for (int i = 0; i < 3; ++i)
             if (targetCountIndex != i)
-                others.Add(i);
+                others[i_others++] = i;
         var lesserCountIndex = others[0];
         var greaterCountIndex = others[1];
 
@@ -62,10 +63,11 @@ public static class Solver
         // [ 9 ; 0 ; 18 ] // transfer
         // equalization between 0 and 18 with lesser value growing twice
         // as fast as greater one
-        // (9 - (18 / 3) >= 0 // check if can equalize
+        // ((9 - (18 / 3)) >= 0) // check if can equalize
         // [ 9 - (18 / 3) ; (18 / 3 * 2) ; 18 - (18 / 3) ] // equalize
         var encountersNeeded = 0;
-        while (greaterCount > 0) {
+        while (greaterCount > 0)
+        {
             // transfer
             encountersNeeded += lesserCount;
             greaterCount -= lesserCount;
@@ -92,5 +94,8 @@ public static class Solver
             }
         }
         return encountersNeeded;
+        // or just return greaterCount, because the number of steps is capped
+        // with it from the bottom, which is exactly the minimal number of
+        // steps
     }
 }

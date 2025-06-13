@@ -13,7 +13,9 @@ cd Tests
 dotnet test
 ```
 
-## Measure performance
+## Measure end-to-end execution time
+
+Ryzen 3700x: 97.4 ~ 105 ms
 
 ```
 cd Problem
@@ -36,17 +38,9 @@ $sw = [Diagnostics.Stopwatch]::StartNew()
 $p.Start() | Out-Null
 $output = $p.StandardOutput.ReadToEnd()
 $p.WaitForExit()
-$memUsageBytes = $p.WorkingSet64
 $sw.Stop()
-
-$memUsageB = $memUsageBytes / 1
-$memUsageKB = $memUsageBytes / 1KB
-$memUsageMB = $memUsageBytes / 1MB
 
 Write-Output ("Program output: " + $output.Trim())
 Write-Output ("Exit code: " + $p.ExitCode.ToString())
-Write-Output ("Memory usage (B): " + $memUsageB.ToString())
-Write-Output ("Memory usage (KB): " + $memUsageKB.ToString())
-Write-Output ("Memory usage (MB): " + $memUsageMB.ToString())
 Write-Output ("Elapsed time (ms): " + $sw.Elapsed.TotalMilliseconds.ToString())
 ```

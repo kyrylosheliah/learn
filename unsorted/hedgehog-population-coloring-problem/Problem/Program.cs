@@ -36,7 +36,6 @@ rootCommand.SetHandler((red, green, blue, target) =>
 {
     int[] population = [red, green, blue];
     int result = Solver.Solve(population, target.ToLower());
-    //Console.WriteLine($"Result: {result}");
     Console.WriteLine(result.ToString());
 }, redOption, greenOption, blueOption, targetOption);
 
