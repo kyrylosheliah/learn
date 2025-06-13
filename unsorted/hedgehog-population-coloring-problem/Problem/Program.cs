@@ -25,7 +25,13 @@ var targetOption = new Option<string>(
 targetOption.IsRequired = true;
 targetOption.AddAlias("-t");
 
-var rootCommand = new RootCommand("Hedgehog color solver")
+var rootCommand = new RootCommand(@"Hedgehog coloring solver.
+Given a target color and an array of red, green and blue hedgehogs color
+population counts, output the minimal number of encounters needed for all
+hedgehogs to transition into the target color (-1, if unsolvable).
+Encounter  transition rules:
+color1 + color2 = 2 * color3
+color1 != color2 != color3")
 {
     redOption,
     greenOption,
