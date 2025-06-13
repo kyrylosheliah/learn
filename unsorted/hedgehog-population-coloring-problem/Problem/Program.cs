@@ -1,22 +1,22 @@
 ﻿using System.CommandLine;
 using Problem;
 
-var redOption = new Option<int>(
+var redOption = new Option<uint>(
     name: "--red",
     description: "Number of red hedgehogs",
-    getDefaultValue: () => 0);
+    getDefaultValue: () => 0u);
 redOption.AddAlias("-r");
 
-var greenOption = new Option<int>(
+var greenOption = new Option<uint>(
     name: "--green",
     description: "Number of green hedgehogs",
-    getDefaultValue: () => 0);
+    getDefaultValue: () => 0u);
 greenOption.AddAlias("-g");
 
-var blueOption = new Option<int>(
+var blueOption = new Option<uint>(
     name: "--blue",
     description: "Number of blue hedgehogs",
-    getDefaultValue: () => 0);
+    getDefaultValue: () => 0u);
 blueOption.AddAlias("-b");
 
 var targetOption = new Option<string>(
@@ -40,7 +40,7 @@ color1 != color2 != color3")
 };
 rootCommand.SetHandler((red, green, blue, target) =>
 {
-    int[] population = [red, green, blue];
+    uint[] population = [red, green, blue];
     int result = Solver.Solve(population, target.ToLower());
     Console.WriteLine(result.ToString());
 }, redOption, greenOption, blueOption, targetOption);

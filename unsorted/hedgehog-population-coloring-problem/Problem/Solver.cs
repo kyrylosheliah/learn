@@ -2,7 +2,7 @@ namespace Problem;
 
 public static class Solver
 {
-    public static int Solve(int[] population, string targetColor)
+    public static int Solve(uint[] population, string targetColor)
     {
         int targetCountIndex = targetColor switch
         {
@@ -41,7 +41,7 @@ public static class Solver
 
         // paired quantities = to be transfered to target color group
         if (population[lesserCountIndex] == population[greaterCountIndex])
-            return population[lesserCountIndex];
+            return (int)population[lesserCountIndex];
 
         if (population[lesserCountIndex] > population[greaterCountIndex])
         { // swap
@@ -65,7 +65,7 @@ public static class Solver
         // as fast as greater one
         // ((9 - (18 / 3)) >= 0) // check if can equalize
         // [ 9 - (18 / 3) ; (18 / 3 * 2) ; 18 - (18 / 3) ] // equalize
-        var encountersNeeded = 0;
+        var encountersNeeded = 0u;
         while (greaterCount > 0)
         {
             // transfer
@@ -93,7 +93,7 @@ public static class Solver
                 targetCount = 0;
             }
         }
-        return encountersNeeded;
+        return (int)encountersNeeded;
         // or just return greaterCount, because the number of steps is capped
         // with it from the bottom, which is exactly the minimal number of
         // steps
