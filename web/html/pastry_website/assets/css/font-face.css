@@ -1,0 +1,24 @@
+@font-face {
+	font-family: "Evolventa";
+	src: local("Evolventa-Regular"), url("../font/Evolventa-Regular.ttf") format("truetype"), url("../font/Evolventa-Regular.otf") format("opentype"), url("../font/Evolventa-Regular.woff") format("woff");
+	font-weight: normal;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Evolventa";
+	src: local("Evolventa-Oblique"), url("../font/Evolventa-Oblique.ttf") format("truetype"), url("../font/Evolventa-Oblique.otf") format("opentype"), url("../font/Evolventa-Oblique.woff") format("woff");
+	font-weight: normal;
+	font-style: italic;
+}
+@font-face {
+	font-family: "Evolventa";
+	src: local("Evolventa-Bold"), url("../font/Evolventa-Bold.ttf") format("truetype"), url("../font/Evolventa-Bold.otf") format("opentype"), url("../font/Evolventa-Bold.woff") format("woff");
+	font-weight: bold;
+	font-style: normal;
+}
+@font-face {
+	font-family: "Evolventa";
+	src: local("Evolventa-BoldOblique"), url("../font/Evolventa-BoldOblique.ttf") format("truetype"), url("../font/Evolventa-BoldOblique.otf") format("opentype"), url("../font/Evolventa-BoldOblique.woff") format("woff");
+	font-weight: bold;
+	font-style: italic;
+}

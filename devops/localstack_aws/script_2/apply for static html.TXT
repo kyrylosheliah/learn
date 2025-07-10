@@ -1,0 +1,3 @@
+awslocal s3 rm s3://testwebsite/index.html --recursive --dryrun   
+
+awslocal s3 website s3://testwebsite/ --index-document index.html --error-document error.html

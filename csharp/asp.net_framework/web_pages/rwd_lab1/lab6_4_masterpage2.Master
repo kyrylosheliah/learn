@@ -1,0 +1,45 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="lab6_4_masterpage2.master.cs" Inherits="rwd_lab1.lab6_4_masterpage2" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <title>Untitled Page</title>
+    <asp:ContentPlaceHolder ID="ContentPlaceHolder2" runat="server"></asp:ContentPlaceHolder>
+    <webopt:bundlereference runat="server" path="~/Content/css" />
+    <asp:PlaceHolder runat="server">
+        <%: Styles.Render("~/Styles/css") %>
+    </asp:PlaceHolder>
+</head>
+<body>
+    <form id="form2" runat="server">
+        <div>
+            <table style="width: 100%; height: 100%; background-color: #bfff8020">
+                <tr>
+                    <td colspan="2" style="height: 200px">
+                        <h2>Пример использования Мастер-страницы №2</h2>
+                        <asp:Label id="MasterLabel" Text="" runat="server" />
+                    </td>
+                    <td id="MasterLogo"><img src="./Images/random-logo-png-transparent.png"/></td>
+                </tr>
+                <tr>
+                    <td colspan="3" id="MenuAside">
+                        Меню
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="height: 200px">Нижний колонтитул</td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</body>
+</html>
+
+
+

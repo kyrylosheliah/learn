@@ -1,0 +1,4 @@
+efficientnet-lite0.tflite
+efficientnet-lite1.tflite
+efficientnet-lite2.tflite
+mobilenetv1.tflite

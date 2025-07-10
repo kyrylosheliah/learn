@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+	<siteMapNode url="Default" title="Default">
+		<siteMapNode url="lab1" title="lab1" />
+		<siteMapNode url="lab2" title="lab1">
+			<siteMapNode url="lab2_2" title="lab1" />
+			<siteMapNode url="lab2_3" title="lab1" />
+			<siteMapNode url="lab2_4" title="lab1" />
+			<siteMapNode url="lab2_5" title="lab1" />
+		</siteMapNode>
+		<siteMapNode url="lab3" title="lab3">
+			<siteMapNode url="lab3_2" title="lab3_2" />
+			<siteMapNode url="lab3_3" title="lab3_3" />
+		</siteMapNode>
+		<siteMapNode url="lab4" title="lab4">
+			<siteMapNode url="lab4_2" title="aspx" />
+			<siteMapNode url="lab4_3" title="lab4_3" />
+			<siteMapNode url="lab4_4" title="lab4_4" />
+			<siteMapNode url="lab4_5" title="lab4_5" />
+			<siteMapNode url="lab4_6" title="lab4_6" />
+			<siteMapNode url="lab4_7" title="lab4_7" />
+		</siteMapNode>
+		<siteMapNode url="lab5_1_addusers" title="lab5_1_addusers">
+			<siteMapNode url="lab5_2_Default" title="lab5_2_Default" />
+			<siteMapNode url="lab5_3_Login" title="lab5_3_Login" />
+			<siteMapNode url="lab5_4_HashPasswords" title="lab5_4_HashPasswords" />
+			<siteMapNode url="lab5_5_SetCookiePersistance" title="lab5_5_SetCookiePersistance" />
+			<siteMapNode url="lab5_6_Login" title="lab5_6_Login" />
+			<siteMapNode url="lab5_7_Register" title="lab5_7_Register" />
+			<siteMapNode url="lab5_8_DeleteUser" title="lab5_8_DeleteUser" />
+			<siteMapNode url="lab5_9_UserList" title="lab5_9_UserList" />
+			<siteMapNode url="lab5_10_UpdateUser" title="lab5_10_UpdateUser" />
+		</siteMapNode>
+		<siteMapNode url="lab6_2_TestContent" title="lab6_2_TestContent">
+			<siteMapNode url="lab6_3_Default1" title="lab6_3_Default1" />
+			<siteMapNode url="lab6_3_Default2" title="lab6_3_Default2" />
+			<siteMapNode url="lab6_4_HasVariableMaster" title="lab6_4_HasVariableMaster" />
+			<siteMapNode url="lab6_5_PageForNestedMaster" title="lab6_5_PageForNestedMaster" />
+		</siteMapNode>
+		<siteMapNode url="lab7_3_PageHasTreeViewMaster" title="lab7_3_PageHasTreeViewMaster">
+			<siteMapNode url="lab7_4_HasMasterNaviagationAccess" title="lab7_4_HasMasterNaviagationAccess" />
+			<siteMapNode url="lab7_5_RegisterMultiview" title="lab7_5_RegisterMultiview" />
+			<siteMapNode url="lab7_6_Wizard" title="lab7_6_Wizard" />
+		</siteMapNode>
+	</siteMapNode>
+</siteMap>

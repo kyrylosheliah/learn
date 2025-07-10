@@ -1,0 +1,12 @@
+﻿#MenuAside{
+    min-width: 300px;
+    width: 20%;
+    vertical-align: top;
+    background-color: lightgray;
+}
+#MasterLogo>img{
+    width: 200px;
+}
+h2{
+    font-family: Tahoma;
+}

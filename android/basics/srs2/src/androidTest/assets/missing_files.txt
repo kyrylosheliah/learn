@@ -1,0 +1,2 @@
+coffee.jpg
+mobilenetv1.tflite

@@ -1,0 +1,11 @@
+/**/.vscode/
+/**/.vs
+/**/.ipynb_checkpoints/
+
+/**/bin/
+/**/obj/
+
+*.exe
+/**/void
+
+/**/__pycache__/

@@ -1,0 +1,2 @@
+https://medium.com/codex/3d-graphics-with-opengl-in-android-5e5d8a4f7d2b
+http://kalisandroid.blogspot.com/2016/07/draw-3d-photo-cube-with-opengl-in.html

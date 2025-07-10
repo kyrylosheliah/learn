@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<head lang="ua">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>КОЛОС - Ресторан, Кондитерська, Пекарня</title>
+<link type="image/x-icon" rel="shortcut icon" href="assets/png/icon/icon32.ico">
+<link type="image/png" sizes="16x16" rel="icon" href="assets/png/icon/icon16.png">
+<link type="image/png" sizes="32x32" rel="icon" href="assets/png/icon/icon32.png">
+<link type="image/png" sizes="64x64" rel="icon" href="assets/png/icon/icon64.png">
+<link href="assets/css/font-face.css" rel="stylesheet">
+<link href="assets/css/bootstrap.min.css" rel="stylesheet">
+<link href="assets/css/reseter.css" rel="stylesheet">
+<link href="assets/css/splide.min.css" rel="stylesheet">
+<link href="assets/css/style.css" rel="stylesheet">
+<link href="assets/css/media.css" rel="stylesheet">
+<script src="assets/js/jquery-3.6.0.min.js"></script>
+<script src="assets/js/bootstrap.min.js"></script>
+<script src="assets/js/svg-inject.min.js"></script>
+<script src="assets/js/splide.min.js"></script>
+<style>
+	@media(min-width:992px){
+		.mobilebar-space{
+			display: none;
+		}
+	}
+	@media(max-width:768px){
+		.path-group{
+			margin-bottom: 0;
+		}
+	}
+	@media(max-width:576px){
+		.CT{
+			margin-top: 0 !important;
+		}
+	}
+</style>
+</head>
+
+<body>
+
+	<button id="scrollBegin">^</button>
+
+	<div class="aside sidebar-left flex-column text-center align-items-center">
+		<div class="sidebar-header d-flex flex-column justify-content-between align-items-center">
+			<a href="index.html" title="На головну"><img src="assets/png/kolos_icon_190x144.png" width="190px" alt=""></a>
+			<a href="index.html" title="На головну"><img src="assets/svg/kolos_logo.svg" onload="SVGInject(this)" width="190px" alt="КОЛОС"></a>
+		</div>
+		<div class="sidebar-body d-flex flex-column justify-content-between align-items-center">
+			<div class="icons d-flex flex-row justify-content-between w-50">
+				<a href="#" class="menu-icon" title="Вхід"><img src="assets\svg\icon_cabinet_login.svg" onload="SVGInject(this)" alt="login"></a>
+				<a href="#" class="menu-icon" title="Пошук"><img src="assets\svg\icon_search.svg" onload="SVGInject(this)"alt="search"></a>
+				<a href="#" class="menu-icon" title="До кошику"><img src="assets\svg\icon_shopping_cart.svg" onload="SVGInject(this)" alt="shopping_cart"></a>
+			</div>
+			<nav class="menu d-flex flex-column justify-content-between">
+				<a href="index.html"><div>ГОЛОВНА</div></a>
+				<a href="shopList.html"><div>МАГАЗИН</div></a>
+				<a href="restaurant.html"><div>РЕСТОРАН</div></a>
+				<a href="faq.html"><div>FAQ</div></a>
+				<a href="about.html"><div>ПРО НАС</div></a>
+			</nav>
+			<div class="icons d-flex flex-row justify-content-between w-50">
+				<a href="#" class="menu-icon" title="Наш Twitter"><img src="assets\svg\icon_twitter.svg" onload="SVGInject(this)" alt="twitter"></a>
+				<a href="#" class="menu-icon" title="Наш Telegram"><img src="assets\svg\icon_telegram.svg" onload="SVGInject(this)" alt="telegram"></a>
+				<a href="#" class="menu-icon" title="Наш Instagram"><img src="assets\svg\icon_instagram.svg" onload="SVGInject(this)" alt="instagram"></a>
+			</div>
+		</div>
+	</div>
+
+	<div class="mobilebar d-flex flex-row justify-content-between">
+		<a href="index.html" title="На головну"><img class="mobilebar-menu-logo" src="assets/svg/kolos_logo.svg" onload="SVGInject(this)" alt="КОЛОС"></a>
+		<div class="mobilebar-menu d-flex flex-row justify-content-between align-items-center">
+			<a href="#" title="Вхід"><img class="mobilebar-menu-icon" src="assets\svg\icon_cabinet_login.svg" onload="SVGInject(this)" alt="login"></a>
+			<a href="#" title="Пошук"><img class="mobilebar-menu-icon" src="assets\svg\icon_search.svg" onload="SVGInject(this)" alt="search"></a>
+			<a href="#" title="До кошику"><img class="mobilebar-menu-icon" src="assets\svg\icon_shopping_cart.svg" onload="SVGInject(this)" alt="shopping_cart"></a>
+			<a class="mobilebar-menu-toggle d-flex flex-column justify-content-between">
+				<span></span>
+				<span></span>
+				<span></span>
+			</a>
+		</div>
+	</div>
+
+	<div class="mobilebar-navigation d-flex flex-column justify-content-center text-center">
+		<nav class="menu d-flex flex-column justify-content-between text-center h-75">
+			<a href="index.html"><div>ГОЛОВНА</div></a>
+			<a href="shopList.html"><div>МАГАЗИН</div></a>
+			<a href="restaurant.html"><div>РЕСТОРАН</div></a>
+			<a href="faq.html"><div>FAQ</div></a>
+			<a href="about.html"><div>ПРО НАС</div></a>
+		</nav>
+	</div>
+		
+	<div class="page container-fluid d-flex flex-row justify-content-between">
+
+		<div class="sidebar-space-left"></div>
+	
+		<div class="content">
+			
+			<div class="mobilebar-space"></div>
+
+			<div class="mobile-header">
+				<div class="mobile-header-images d-flex flex-column justify-content-center align-items-center">
+					<a href="index.html" title="На головну"><img src="assets/png/kolos_icon_190x144.png" width="190px" alt=""></a>
+					<a href="index.html" title="На головну"><img src="assets/svg/kolos_logo.svg" onload="SVGInject(this)" width="190px" alt="КОЛОС"></a>
+				</div>
+				<div class="path-group d-flex flex-row flex-wrap justify-content-center align-items-center">
+					<a href="index.html">
+						<div class="path-item d-flex justify-content-center align-items-center">
+							<img class="path-left" src="assets/svg/path-left.svg" onload="SVGInject(this)"></img>
+							<div class="path-text">Головна</div>
+							<img class="path-right" src="assets/svg/path-right.svg" onload="SVGInject(this)"></img>
+						</div>
+					</a>
+				</div>
+			</div>
+
+			<div id="gallery-index" class="carousel slide carousel-fade" data-ride="carousel">
+				<ol class="carousel-indicators">
+					<li data-target="#gallery-index" data-slide-to="0" class="active"></li>
+					<li data-target="#gallery-index" data-slide-to="1"></li>
+					<li data-target="#gallery-index" data-slide-to="2"></li>
+					<li data-target="#gallery-index" data-slide-to="3"></li>
+				</ol>
+				<div class="carousel-inner" role="listbox">
+					<div class="carousel-item active">
+						<img src="assets/jpg/int/ext1.jpg" loading="lazy" alt="mainscreen-image1">
+						<div class="carousel-caption">
+							<h5>Ресторан «Колос»</h5>
+							<p>Відвідуйте та отримуйте почуття.</p>
+						</div>
+					</div>
+					<div class="carousel-item">
+						<img src="assets/jpg/int/int1.jpg" loading="lazy" alt="mainscreen-image2">
+						<div class="carousel-caption">
+							<h5>Ресторан «Колос»</h5>
+							<p>Почувайтеся саме тут, саме так.</p>
+						</div>
+					</div>
+					<div class="carousel-item">
+						<img src="assets/jpg/int/main1.jpg" loading="lazy" alt="mainscreen-image3">
+						<div class="carousel-caption">
+							<h5>Пікарня «Колос»</h5>
+							<p>Хочете повторити?</p>
+						</div>
+					</div>
+					<div class="carousel-item">
+						<img src="assets/jpg/int/main2.jpg" loading="lazy" alt="mainscreen-image4">
+						<div class="carousel-caption">
+							<h5>Кондитерська «Колос»</h5>
+							<p>Перевірте нас на різноманіття.</p>
+						</div>
+					</div>
+				</div>
+				<a class="carousel-control-prev" href="#gallery-index" role="button" data-slide="prev">
+					<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+					<span class="sr-only">Previous</span>
+				</a>
+				<a class="carousel-control-next" href="#gallery-index" role="button" data-slide="next">
+					<span class="carousel-control-next-icon" aria-hidden="true"></span>
+					<span class="sr-only">Next</span>
+				</a>
+			</div>
+			
+			<div class="center container d-flex flex-column justify-content-center">
+			
+				<div class="main-about row order-2 order-md-1">
+					<div class="col-12 col-md-9 col-xl-8 offset-xl-1 d-flex flex-column justify-content-between">
+						<h3 class="main-about-title text-center">Про ресторан</h3>
+						<div class="main-about-body color5f5f5f text-justify">
+							<div>Ми відкрили свої двері в X році, і того першого дня ми продали все обпечене благо до обіду. За останні Y років ми дізналися кілька важких тайн продуктивності, але маємо честь все одно радувати клієнтів так само, як радіємо ми самі. Ми пишаємося тим, що створили достатньо професіональне місце, у якому все ж піклуються один про одного, не забуваючи і про вас.</div>
+							<div>Наш ресторанний зал ідеально підходить для святкування прекрасних моментів життя. Для нас наш ресторан - це обробка тіста рано вранці, посмішки на обличчях маленьких, приготування до великої зустрічі чудовим кофе брейком і привід затриматися зі старим другом.</div>
+							<div>Запрошуємо Вас до хорошого настрою!</div>
+						</div>
+						<div class="main-about-btnimg d-flex flex-row justify-content-around">
+							<button type="button" class="main-about-button" onclick="document.location='restaurant.html'">Дізнатия більше</button>
+							<div><img class="main-about-pic1" loading="lazy" src="assets/png/about-index/first.png" alt=""></div>
+						</div>
+					</div>
+					<div class="col-3 d-none d-md-flex flex-column justify-content-around">
+						<div class="align-self-end"><img class="main-about-pic3" loading="lazy" src="assets/png/about-index/third.png" alt=""></div>
+						<div class="align-self-start"><img class="main-about-pic2" loading="lazy" src="assets/png/about-index/second.png" alt=""></div>
+					</div>
+				</div>
+			
+				<div class="DM row justify-content-center order-3 order-md-2">
+					<div class="col-12 col-lg-8 col-xl-6 d-flex flex-column">
+						<div class="DM-header text-center">
+							<h4 class="DM-title">Сьогоднішнє меню</h4>
+							<hr class="w-100 mx-auto">
+						</div>
+						<ul class="DM-list d-flex flex-column justify-content-start">
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-0">
+									<div class="DM-list-item-name">Cалат A</div>
+									<div class="DM-list-item-description color5f5f5f">Освіжаючий, ніби зірваний в густому саду</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-1">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-1">
+									<div class="DM-list-item-name">Печіво A</div>
+									<div class="DM-list-item-description color5f5f5f">Привітний вигляд солодкої та золотої крихти</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-0">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-1">
+									<div class="DM-list-item-name">М`ясний рулет A</div>
+									<div class="DM-list-item-description color5f5f5f">Соковита пряність</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-0">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-1">
+									<div class="DM-list-item-name">Торт A</div>
+									<div class="DM-list-item-description color5f5f5f">Ваш найсолодший співрозмовник</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-0">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-1">
+									<div class="DM-list-item-name">Кекс A</div>
+									<div class="DM-list-item-description color5f5f5f">Губчастий шоколадний шматочок</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-0">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-0">
+									<div class="DM-list-item-name">Cалат B</div>
+									<div class="DM-list-item-description color5f5f5f">Освіжаючий, ніби зірваний в густому саду</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-1">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-1">
+									<div class="DM-list-item-name">Печіво B</div>
+									<div class="DM-list-item-description color5f5f5f">Привітний вигляд солодкої та золотої крихти</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-0">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-1">
+									<div class="DM-list-item-name">М`ясний рулет B</div>
+									<div class="DM-list-item-description color5f5f5f">Соковита пряність</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-0">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-1">
+									<div class="DM-list-item-name">Торт B</div>
+									<div class="DM-list-item-description color5f5f5f">Ваш найсолодший співрозмовник</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-0">XXX$</div>
+							</li>
+							<li class="DM-list-item d-flex flex-row justify-content-between">
+								<div class="d-flex flex-column flex-shrink-1">
+									<div class="DM-list-item-name">Кекс B</div>
+									<div class="DM-list-item-description color5f5f5f">Губчастий шоколадний шматочок</div>
+								</div>
+								<div class="DM-list-item-price color5f1f1f flex-shrink-0">XXX$</div>
+							</li>
+						</ul>
+						<div class="DM-footer text-center">
+							<hr class="w-100 mx-auto">
+						</div>
+					</div>
+				</div>
+			
+				<div class="POTM row order-4 order-md-3">
+					<div class="POTM-header col-12 d-flex text-center justify-content-center">
+						<div class="d-flex flex-column">
+							<h4>Рекомендуємо: продукт місяця</h4>
+							<hr>
+						</div>
+					</div>
+					<div class="POTM-image col-12 col-md-6">
+						<div class="w-100">
+							<div class="primary-slider splide">
+								<div class="splide__track">
+									<ul class="splide__list">
+										<li class="splide__slide">
+											<img src="assets/png/item/productSample1.png" loading="lazy" alt="productname1">
+										</li>
+										<li class="splide__slide">
+											<img src="assets/png/item/productSample2.png" loading="lazy" alt="productname2">
+										</li>
+										<li class="splide__slide">
+											<img src="assets/png/item/productSample3.png" loading="lazy" alt="productname3">
+										</li>
+									</ul>
+								</div>
+							</div>
+							<div class="secondary-slider splide">
+								<div class="splide__track">
+									<ul class="splide__list">
+										<li class="splide__slide">
+											<img src="assets/png/item/productSample1-preview.png" loading="lazy" alt="productname-preview1">
+										</li>
+										<li class="splide__slide">
+											<img src="assets/png/item/productSample2-preview.png" loading="lazy" alt="productname-preview2">
+										</li>
+										<li class="splide__slide">
+											<img src="assets/png/item/productSample3-preview.png" loading="lazy" alt="productname-preview3">
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="POTM-body col-12 col-md-6 d-flex flex-column">
+						<h5>Печіво X</h5>
+						<div class="color5f1f1f">XXX$</div>
+						<div class="color5f5f5f">Фірмове печиво зігріває очі золотим відтінком літньої пшениці. Тут є все, що вносить у свою продукцію «Колос»: аромат, текстура, чисті інгредієнти та насичені шматочки шоколаду. Мелене насіння льону надає тонкий горіховий хруст.</div>
+						<div class="d-flex justify-content-around">
+							<div class="quantity btn-group" role="group">
+								<button class="quantity-minus" type="button">-</button>
+								<input class="quantity-number" type="number" min="1" max="100" value="1">
+								<button class="quantity-plus" type="button">+</button>
+							</div>
+							<button type="button">Кошик: додати</button>
+						</div>
+					</div>
+				</div>
+			
+				<div class="CT row order-1 order-md-4">
+					<div class="CT-block col-6 col-md-4 col-lg-3">
+						<div class="CT-block-image">
+							<a href="shopList.html" title="Категорія">
+								<img src="assets/png/category-sample.png" alt="Категорія">
+							</a>
+						</div>
+						<div class="CT-block-cover d-none d-lg-flex justify-content-center align-items-center">
+							<button class="d-block" onclick="document.location='shopList.html'" type="button">Переглянути</button>
+						</div>
+						<h5 class="CT-block-title">Категорія</h5>
+						<div class="CT-block-quantity">12 виробів</div>
+					</div>
+					<div class="CT-block col-6 col-md-4 col-lg-3">
+						<div class="CT-block-image">
+							<a href="shopList.html" title="Категорія">
+								<img src="assets/png/category-sample.png" alt="Категорія">
+							</a>
+						</div>
+						<div class="CT-block-cover d-none d-lg-flex justify-content-center align-items-center">
+							<button class="d-block" onclick="document.location='shopList.html'" type="button">Переглянути</button>
+						</div>
+						<h5 class="CT-block-title">Категорія</h5>
+						<div class="CT-block-quantity">12 виробів</div>
+					</div>
+					<div class="CT-block col-6 col-md-4 col-lg-3">
+						<div class="CT-block-image">
+							<a href="shopList.html" title="Категорія">
+								<img src="assets/png/category-sample.png" alt="Категорія">
+							</a>
+						</div>
+						<div class="CT-block-cover d-none d-lg-flex justify-content-center align-items-center">
+							<button class="d-block" onclick="document.location='shopList.html'" type="button">Переглянути</button>
+						</div>
+						<h5 class="CT-block-title">Категорія</h5>
+						<div class="CT-block-quantity">12 виробів</div>
+					</div>
+					<div class="CT-block col-6 col-md-4 col-lg-3">
+						<div class="CT-block-image">
+							<a href="shopList.html" title="Категорія">
+								<img src="assets/png/category-sample.png" alt="Категорія">
+							</a>
+						</div>
+						<div class="CT-block-cover d-none d-lg-flex justify-content-center align-items-center">
+							<button class="d-block" onclick="document.location='shopList.html'" type="button">Переглянути</button>
+						</div>
+						<h5 class="CT-block-title">Категорія</h5>
+						<div class="CT-block-quantity">12 виробів</div>
+					</div>
+					<div class="CT-block col-6 col-md-4 col-lg-3">
+						<div class="CT-block-image">
+							<a href="shopList.html" title="Категорія">
+								<img src="assets/png/category-sample.png" alt="Категорія">
+							</a>
+						</div>
+						<div class="CT-block-cover d-none d-lg-flex justify-content-center align-items-center">
+							<button class="d-block" onclick="document.location='shopList.html'" type="button">Переглянути</button>
+						</div>
+						<h5 class="CT-block-title">Категорія</h5>
+						<div class="CT-block-quantity">12 виробів</div>
+					</div>
+					<div class="CT-block col-6 col-md-4 col-lg-3">
+						<div class="CT-block-image">
+							<a href="shopList.html" title="Категорія">
+								<img src="assets/png/category-sample.png" alt="Категорія">
+							</a>
+						</div>
+						<div class="CT-block-cover d-none d-lg-flex justify-content-center align-items-center">
+							<button class="d-block" onclick="document.location='shopList.html'" type="button">Переглянути</button>
+						</div>
+						<h5 class="CT-block-title">Категорія</h5>
+						<div class="CT-block-quantity">12 виробів</div>
+					</div>
+					<div class="CT-block col-6 col-md-4 col-lg-3">
+						<div class="CT-block-image">
+							<a href="shopList.html" title="Категорія">
+								<img src="assets/png/category-sample.png" alt="Категорія">
+							</a>
+						</div>
+						<div class="CT-block-cover d-none d-lg-flex justify-content-center align-items-center">
+							<button class="d-block" onclick="document.location='shopList.html'" type="button">Переглянути</button>
+						</div>
+						<h5 class="CT-block-title">Категорія</h5>
+						<div class="CT-block-quantity">12 виробів</div>
+					</div>
+					<div class="CT-block col-6 col-md-4 col-lg-3">
+						<div class="CT-block-image">
+							<a href="shopList.html" title="Категорія">
+								<img src="assets/png/category-sample.png" alt="Категорія">
+							</a>
+						</div>
+						<div class="CT-block-cover d-none d-lg-flex justify-content-center align-items-center">
+							<button class="d-block" onclick="document.location='shopList.html'" type="button">Переглянути</button>
+						</div>
+						<h5 class="CT-block-title">Категорія</h5>
+						<div class="CT-block-quantity">12 виробів</div>
+					</div>
+				</div>
+			
+				<div class="map-index row order-5 order-md-5 justify-content-center">
+					<div class="map-index-content col-12 col-lg-9">
+						<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d86873.628138457!2d37.51192319525535!3d47.122573654418886!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x40e6e6a7bee7582b%3A0xa5d118300a75b5ce!2z0JzQsNGA0LjRg9C_0L7Qu9GMLCDQlNC-0L3QtdGG0LrQsNGPINC-0LHQu9Cw0YHRgtGMLCA4NzUwMA!5e0!3m2!1sru!2sua!4v1620312484276!5m2!1sru!2sua" allowfullscreen="" loading="lazy"></iframe>
+					</div>
+					<div class="map-index-info col-12 col-md-6 col-lg-3 d-flex flex-column justify-content-center">
+						<div class="text-center">
+							<div class="color5f1f1f">Адреса</div>
+							<a href="tel:+380000000000" title="Натисніть, щоб зателефонувати">+380 00 000 0000</a>
+							<a href="mailto:aaa@bbb.ccc" title="Пишіть нам на нашу електронну пошту">aaa@bbb.ccc</a>
+						</div>
+						<div class="color5f1f1f">
+							<div><b>Часи</b></div>
+							<div class="d-flex flex-row justify-content-between">
+								<div>ПН-ПТ</div>
+								<div>10:00 - 18:00</div>
+							</div>
+							<div class="d-flex flex-row justify-content-between">
+								<div>СБ</div>
+								<div>10:00 - 16:00</div>
+							</div>
+							<div class="d-flex flex-row justify-content-between">
+								<div>ВС</div>
+								<div>вихідний</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			
+				<div class="footer d-flex flex-column order-6 order-md-6 justify-content-center text-center">
+					<div class="col-12 footer-logo align-self-center">
+						<a href="index.html" title="На головну"><img src="assets/svg/kolos_logo.svg" onload="SVGInject(this)" alt="КОЛОС"></a>
+					</div>
+					<div class="col-12">
+						<div class="row justify-content-center">
+							<div class="col-12 col-md-6 col-lg-4 order-1 footer-body-left d-flex flex-column justify-content-center">
+								<a href="index.html">Головна</a>
+								<a href="faq.html">FAQ</a>
+								<a href="about.html">Про "КОЛОС"</a>
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 order-2 order-md-3 order-lg-2 footer-body-center d-flex flex-column justify-content-center">
+								<h5>Отримуйте нашу розсилку</h5>
+								<div class="text-justify">Ви можете мати доступ до спеціальних пропозицій, інформації про івенти та тематичне меню.</div>
+								<form class="form-mailing" role="form">
+									<label for="mailing">Ваш email:</label>
+									<input type="email" class="mailing form-control" name="mailing" placeholder="example@mail.domain" required>
+									<button type="submit">Відправити→</button>
+								</form>
+							</div>
+							<div class="col-12 col-md-6 col-lg-4 order-3 order-md-2 order-lg-3 footer-body-right d-flex flex-column justify-content-center align-items-center">
+								<a href="mailto:aaa@bbb.ccc" title="Пишіть нам на нашу електронну пошту">aaa@bbb.ccc</a>
+								<a href="tel:+380000000000" title="Натисніть, щоб зателефонувати">+380 00 000 0000</a>
+								<div class="d-flex flex-row justify-content-around w-50">
+									<a href="#" class="footer-icon" title="Наш Twitter"><img src="assets\svg\icon_twitter.svg" onload="SVGInject(this)" alt="twitter"></a>
+									<a href="#" class="footer-icon" title="Наш Telegram"><img src="assets\svg\icon_telegram.svg" onload="SVGInject(this)"alt="telegram"></a>
+									<a href="#" class="footer-icon" title="Наш Instagram"><img src="assets\svg\icon_instagram.svg" onload="SVGInject(this)" alt="instagram"></a>
+								</div>
+							</div>
+						</div>
+					</div>
+					<hr class="hr-footer">
+					<div class="col-12 footer-copyright col-12">Copyright Ⓒ КОЛОС 20ХХ Усі права захищено</div>
+				</div>
+			</div>
+		
+		</div>
+	
+		<!-- <div class="sidebar-space-right"></div> -->
+
+	</div>
+
+		<!-- <div class="aside sidebar-right"></div> -->
+
+	<script src="assets/js/style.js"></script>
+	<script>
+		$(window).on('load', ()=>{
+			var secondarySlider = new Splide('.secondary-slider', {
+				height      : '100px',
+				width       : '100%',
+				fixedHeight : 100,
+				fixedWidth  : 100,
+				gap         : 4,
+				arrows      : false,
+				pagination  : false,
+				cover       : true,
+				isNavigation: true,
+				focus       : 'center',
+		} ).mount();
+			var primarySlider = new Splide('.primary-slider', {
+				type       : 'fade',
+				heightRatio: 1,
+				pagination : false,
+				arrows     : true,
+				cover      : true,
+			} );
+			primarySlider.sync(secondarySlider).mount();
+		});
+	</script>
+</body>
+</html>

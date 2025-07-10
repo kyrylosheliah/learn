@@ -1,0 +1,13 @@
+localstack status services
+python "C:\Users\I\Appdata\Local\Programs\Python\Python310\Scripts\\localstack" status services
+awslocal s3api create-bucket --bucket testwebsite
+localstack status services
+python "C:\Users\I\Appdata\Local\Programs\Python\Python310\Scripts\\localstack" status services
+
+d:
+cd .\Desktop\tho_lab4\
+awslocal s3 sync .\ s3://testwebsite
+awslocal s3 website s3://testwebsite/ --index-document index.html --error-document error.html
+awslocal s3 ls s3://testwebsite
+
+// will host at testwebsite.s3-website-localhost.localstack.cloud:4566

@@ -1,0 +1,6 @@
+awslocal dynamodb --endpoint-url=http://localhost:4566 create-table --table-name Music --attribute-definitions AttributeName=Artist,AttributeType=S AttributeName=SongTitleAttributeType=S --key-schema AttributeName=Artist,KeyType=HASH AttributeName=SongTitle,KeyType=RANGE --provisioned-throughput ReadCapacityUnits=10,WriteCapacityUnits=5
+
+awslocal dynamodb put-item --endpoint-url http://localhost:4566 --table-name Music --item "{\"Artist\": {\"S\": \"Bleachers\"}, \"SongTitle\": {\"S\": \"Don’t take the money\"}, \"AlbumTitle\": {\"S\": \"Gone now\"}, \"Awards\": {\"N\": \"1000\"}}"
+awslocal dynamodb put-item --endpoint-url http://localhost:4566 --table-name Music --item "{\"Artist\": {\"S\": \"No One You Know\"}, \"SongTitle\": {\"S\": \"Call Me Today\"}, \"AlbumTitle\": {\"S\": \"Somewhat Famouos\"}, \"Awards\": {\"N\": \"1\"}}"
+
+awslocal dynamodb scan --endpoint-url http://localhost:4566 --table-name Music

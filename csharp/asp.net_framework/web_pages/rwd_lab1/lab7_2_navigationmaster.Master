@@ -1,0 +1,71 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="lab7_2_navigationmaster.master.cs" Inherits="rwd_lab1.lab7_2_navigationmaster" %>
+
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    <title>Untitled Page</title>
+    <asp:ContentPlaceHolder ID="head" runat="server"></asp:ContentPlaceHolder>
+    <webopt:bundlereference runat="server" path="~/Content/css" />
+    <asp:PlaceHolder runat="server">
+        <%: Styles.Render("~/Styles/css") %>
+    </asp:PlaceHolder>
+</head>
+<body>
+    <form id="form2" runat="server">
+        <div>
+            <table style="width: 100%; height: 100%; background-color: #bfff8020">
+                <tr>
+                    <td id="MasterLogo"><img src="./Images/random-logo-png-transparent.png"/></td>
+                    <td colspan="2" style="height: 200px">
+                        <h2>lab7_2_navigationmaster</h2>
+                        <asp:Label id="MasterLabel" Text="" runat="server" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h3><asp:HyperLink NavigateUrl="./" ID="hl_Previous" runat="server">hl_Previous</asp:HyperLink></h3>
+                        <h3><asp:HyperLink NavigateUrl="./" ID="hl_Next" runat="server">hl_Next</asp:HyperLink></h3>
+                    </td>
+                    <td colspan="2">
+                        <asp:SiteMapPath SiteMapProvider="lab7_1_map" ID="SiteMapPath1" runat="server" Font-Names="Verdana" Font-Size="0.8em" PathSeparator=" : " RenderCurrentNodeAsLink="false">
+                            <CurrentNodeStyle ForeColor="#333333" />
+                            <NodeStyle Font-Bold="True" ForeColor="#666666" />
+                            <PathSeparatorStyle Font-Bold="True" ForeColor="#1C5E55" />
+                            <RootNodeStyle Font-Bold="True" ForeColor="#1C5E55" />
+                        </asp:SiteMapPath>
+                        <br />
+                        <asp:Menu DataSourceID="SiteMapDataSource1" ID="Menu1" runat="server" BackColor="#E3EAEB" DynamicHorizontalOffset="2" Font-Names="Verdana" Font-Size="0.8em" ForeColor="#666666" StaticSubMenuIndent="10px" Orientation="Horizontal">
+                            <DynamicHoverStyle BackColor="#666666" ForeColor="White" />
+                            <DynamicMenuItemStyle HorizontalPadding="5px" VerticalPadding="2px" />
+                            <DynamicMenuStyle BackColor="#E3EAEB" />
+                            <DynamicSelectedStyle BackColor="#1C5E55" />
+                            <StaticHoverStyle BackColor="#666666" ForeColor="White" />
+                            <StaticMenuItemStyle HorizontalPadding="5px" VerticalPadding="2px" />
+                            <StaticSelectedStyle BackColor="#1C5E55" />
+                        </asp:Menu>
+                        <asp:SiteMapDataSource ShowStartingNode="false" SiteMapProvider="lab7_1_map" ID="SiteMapDataSource1" runat="server" />
+                    </td>
+                </tr>
+                <tr>
+                    <td id="MenuAside">
+                        Меню
+                        <asp:TreeView DataSourceID="SiteMapDataSource1" ID="TreeView1" runat="server" ImageSet="Arrows" ExpandDepth="0">
+                            <HoverNodeStyle Font-Underline="True" ForeColor="#5555DD" />
+                            <NodeStyle Font-Names="Tahoma" Font-Size="10pt" ForeColor="Black" HorizontalPadding="5px" NodeSpacing="0px" VerticalPadding="0px" />
+                            <ParentNodeStyle Font-Bold="False" />
+                            <SelectedNodeStyle Font-Underline="True" ForeColor="#5555DD" HorizontalPadding="0px" VerticalPadding="0px" />
+                        </asp:TreeView>
+                    </td>
+                    <td>
+                        <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="height: 200px">Нижний колонтитул</td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</body>
+</html>
